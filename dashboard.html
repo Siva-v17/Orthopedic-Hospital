@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My dashboard | Stackly Orthopedic Hospital</title>
+<link rel="icon" href="./stackly.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    /* ==========================================================
+       Stackly Orthopedic Hospital - dashboard styles
+       class prefix: stackly-user-
+       ========================================================== */
+
+    :root{--bg:#f5f8ff;--bg2:#ffffff;--card:#ffffff;--teal:#0a6cff;--blue:#ff7a45;--text:#0f2a43;--mute:#566b80;--r:18px;--sp:clamp(48px,6vw,84px)}
+    :root{
+        /* legacy token names mapped onto the hospital theme above */
+        --ink:var(--text); --ink2:#16385a; --indigo:var(--teal); --sky:var(--blue); --sun:var(--blue); --rose:#ff5a5f;
+        --mist:var(--bg); --paper:var(--bg2); --line:rgba(15,42,67,.12);
+        --s:var(--bg2); --s2:#e8f0ff; --vi:var(--teal); --ac:var(--blue); --mint:var(--blue); --grad:var(--teal);
+        --pk:#ff5a5f; --hi:#8fbaff;
+        --tx:#1d3a55; --mut:var(--mute); --bd:rgba(15,42,67,.12);
+        --bad:#c0304f; --warn:#9a6700; --modal:#ffffff;
+        --head:'Bricolage Grotesque',system-ui,sans-serif; --body:'Figtree',system-ui,sans-serif;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+        font:400 1.0625rem/1.6 "Figtree",system-ui,sans-serif;
+        background:var(--bg);
+        color:var(--tx);
+        overflow-x:hidden;
+        -webkit-font-smoothing:antialiased;
+    }
+
+    img{max-width:100%;display:block}
+    a{color:inherit;text-decoration:none}
+    ul{list-style:none}
+    button,input,select{font:inherit;color:inherit}
+    [hidden]{display:none!important}
+
+    h1,h2,h3,h4{
+        font-family:"Bricolage Grotesque",sans-serif;
+        line-height:1.05;
+        font-weight:700;
+    }
+
+    h1{font-size:clamp(1.7rem,3.4vw,2.5rem)}
+    h3{font-size:1.2rem;margin-bottom:12px}
+    h4{font-size:1.05rem;margin:4px 0 6px}
+
+    p,small{color:var(--mut)}
+    :focus-visible{outline:3px solid var(--ac);outline-offset:3px}
+
+    /* ---------- background ---------- */
+    .stackly-user-bg{
+        position:fixed;
+        inset:0;
+        z-index:-1;
+        background:var(--bg);
+    }
+
+    .stackly-user-wm{
+        font:800 1.7rem "Bricolage Grotesque",sans-serif;
+        color:#fff;
+        letter-spacing:-.02em;
+        line-height:1;
+    }
+
+    /* ---------- buttons ---------- */
+    .stackly-user-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        padding:12px 26px;
+        border-radius:999px;
+        background:var(--grad);
+        color:#fff;
+        font:600 1rem "Figtree",sans-serif;
+        border:1px solid transparent;
+        cursor:pointer;
+        box-shadow:none;
+        transition:transform .2s,box-shadow .2s;
+    }
+
+    .stackly-user-btn:hover{box-shadow:0 12px 36px #0a6cff55;transform:translateY(-2px)}
+
+    .stackly-user-btn.stackly-user-ghost{
+        background:transparent;
+        color:var(--tx);
+        border-color:var(--bd);
+        box-shadow:none;
+    }
+
+    .stackly-user-btn.stackly-user-ghost:hover{border-color:var(--ac);color:var(--tx);box-shadow:none;transform:none}
+    .stackly-user-btn.stackly-user-sm{padding:6px 16px;font-size:.85rem}
+
+    @media(prefers-reduced-motion:reduce){
+        *{animation:none!important;transition:none!important}
+    }
+
+    /* ---------- toast ---------- */
+    .stackly-user-toast{
+        position:fixed;
+        left:50%;bottom:28px;
+        transform:translate(-50%,20px);
+        background:var(--modal);
+        border:1px solid var(--bd);
+        color:var(--tx);
+        padding:12px 22px;
+        border-radius:999px;
+        font-weight:700;
+        font-size:14px;
+        box-shadow:0 30px 70px rgba(0,0,0,.5);
+        opacity:0;
+        transition:.3s;
+        z-index:9000;
+        max-width:92vw;
+        text-align:center;
+    }
+
+    .stackly-user-toast.stackly-user-show{opacity:1;transform:translate(-50%,0)}
+
+    /* ---------- layout ---------- */
+    .stackly-user-dash{
+        display:grid;
+        grid-template-columns:260px minmax(0,1fr);
+        min-height:100vh;
+        min-height:100dvh;
+    }
+
+    .stackly-user-sidebar{
+        position:sticky;
+        top:0;
+        height:100dvh;
+        display:flex;
+        flex-direction:column;
+        padding:22px 16px;
+        background:var(--bg);
+        border-right:1px solid var(--bd);
+        z-index:50;
+        overflow-y:auto;
+    }
+
+    .stackly-user-slogo{display:inline-flex}
+    .stackly-user-slogo img{height:70px;width:auto;margin:0 8px 14px}
+    .stackly-user-slogo .stackly-user-wm{margin:0 8px 14px}
+
+    .stackly-user-suser{
+        padding:12px 14px;
+        border-radius:14px;
+        background:var(--card);
+        border:1px solid var(--bd);
+        margin-bottom:18px;
+        min-width:0;
+    }
+
+    .stackly-user-sname{font-weight:700;overflow-wrap:anywhere}
+    .stackly-user-semail{font-size:.78rem;color:var(--mut);overflow-wrap:anywhere}
+    .stackly-user-tier{display:inline-block;margin-top:4px;font-size:.78rem;font-weight:700;color:var(--ac)}
+
+    .stackly-user-nav a{
+        display:flex;
+        gap:12px;
+        align-items:center;
+        padding:11px 14px;
+        border-radius:12px;
+        color:var(--mut);
+        font-weight:500;
+        margin-bottom:4px;
+        transition:background .25s,color .25s;
+        cursor:pointer;
+    }
+
+    .stackly-user-nav a:hover,
+    .stackly-user-nav a.stackly-user-on{background:var(--s2);color:#fff}
+
+    .stackly-user-ic{width:20px;text-align:center}
+
+    .stackly-user-nlabel{
+        padding:14px 14px 6px;
+        font-size:.78rem;
+        font-weight:700;
+        color:var(--mut);
+        opacity:.8;
+    }
+
+    .stackly-user-nlabel:first-child{padding-top:2px}
+    .stackly-user-sfoot{margin-top:auto;padding-top:16px}
+
+    .stackly-user-logout{
+        width:100%;
+        padding:11px;
+        border-radius:999px;
+        border:1px solid var(--bd);
+        background:none;
+        font:600 1rem "Figtree",sans-serif;
+        cursor:pointer;
+        transition:.25s;
+    }
+
+    .stackly-user-logout:hover{border-color:var(--ac)}
+
+    .stackly-user-sclose,
+    .stackly-user-mbtn,
+    .stackly-user-backdrop{display:none}
+
+    .stackly-user-main{padding:22px 32px 48px;min-width:0}
+
+    /* ---------- topbar ---------- */
+    .stackly-user-topbar{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+    .stackly-user-search{flex:1;max-width:460px}
+
+    .stackly-user-search input{
+        width:100%;
+        padding:12px 18px;
+        border-radius:14px;
+        border:1px solid var(--bd);
+        background:var(--s);
+        font-size:15px;
+    }
+
+    .stackly-user-search input::placeholder{color:#8f84bd}
+    .stackly-user-search input:focus{outline:0;border-color:var(--ac)}
+
+    .stackly-user-tr{margin-left:auto;display:flex;align-items:center;gap:12px}
+
+    .stackly-user-rb{
+        position:relative;
+        width:40px;height:40px;
+        border-radius:50%;
+        border:1px solid var(--bd);
+        background:var(--card);
+        display:grid;
+        place-items:center;
+        cursor:pointer;
+    }
+
+    .stackly-user-rb b{
+        position:absolute;
+        top:-5px;right:-5px;
+        min-width:20px;height:20px;
+        padding:0 5px;
+        border-radius:20px;
+        background:var(--pk);
+        color:#0f2a43;
+        font-size:.72rem;
+        display:grid;
+        place-items:center;
+    }
+
+    .stackly-user-dot{
+        position:absolute;
+        top:9px;right:10px;
+        width:8px;height:8px;
+        border-radius:50%;
+        background:var(--pk);
+    }
+
+    .stackly-user-chip{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:5px 14px 5px 5px;
+        border-radius:999px;
+        border:1px solid var(--bd);
+        background:var(--card);
+    }
+
+    .stackly-user-av{
+        width:34px;height:34px;
+        border-radius:50%;
+        background:var(--grad);
+        color:#fff;
+        display:grid;
+        place-items:center;
+        font:800 .9rem "Bricolage Grotesque",sans-serif;
+        flex-shrink:0;
+    }
+
+    .stackly-user-av.stackly-user-big{width:76px;height:76px;font-size:1.8rem}
+    .stackly-user-pn{font-weight:700;font-size:.9rem;line-height:1.2}
+
+    .stackly-user-pagehead{margin-bottom:22px}
+    .stackly-user-pagehead p{margin-top:6px}
+
+    .stackly-user-tab{display:none}
+    .stackly-user-tab.stackly-user-open{display:block}
+
+    /* ---------- stats and panels ---------- */
+    .stackly-user-stats{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+        margin-bottom:20px;
+    }
+
+    .stackly-user-stat,
+    .stackly-user-panel{
+        background:var(--card);
+        border:1px solid var(--bd);
+        border-radius:22px;
+        padding:20px;
+        transition:border-color .3s;
+    }
+
+    .stackly-user-stat:hover,
+    .stackly-user-panel:hover{border-color:var(--ac)}
+
+    .stackly-user-ic2{
+        width:40px;height:40px;
+        border-radius:12px;
+        display:grid;
+        place-items:center;
+        color:#0f2a43;
+        font-weight:700;
+        margin-bottom:12px;
+    }
+
+    .stackly-user-num{font:800 clamp(1.5rem,2.6vw,2.1rem)/1.2 "Bricolage Grotesque",sans-serif}
+    .stackly-user-lbl{color:var(--mut);font-size:.92rem}
+
+    .stackly-user-dgrid{
+        display:grid;
+        grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);
+        gap:18px;
+        margin-bottom:20px;
+    }
+
+    .stackly-user-panel{margin-bottom:20px}
+    .stackly-user-dgrid .stackly-user-panel{margin-bottom:0}
+
+    /* ---------- tables ---------- */
+    .stackly-user-tw{overflow-x:auto}
+    .stackly-user-tw table{width:100%;min-width:480px;border-collapse:collapse}
+
+    .stackly-user-tw th,
+    .stackly-user-tw td{
+        text-align:left;
+        padding:11px 8px;
+        border-bottom:1px solid var(--bd);
+        font-size:.94rem;
+        vertical-align:middle;
+    }
+
+    .stackly-user-tw th{color:var(--mut);font-weight:500}
+
+    .stackly-user-status{
+        display:inline-block;
+        padding:3px 12px;
+        border-radius:999px;
+        font-size:.82rem;
+        font-weight:700;
+        white-space:nowrap;
+        background:var(--s2);
+        color:#8fbaff;
+    }
+
+    .stackly-user-status.stackly-user-ok{background:#ff7a4526;color:var(--ac)}
+    .stackly-user-status.stackly-user-warn{background:#ffb83d26;color:var(--warn)}
+    .stackly-user-status.stackly-user-off{background:#ffffff1a;color:var(--mut)}
+
+    .stackly-user-kv{
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        padding:9px 0;
+        border-bottom:1px solid var(--bd);
+        font-size:.94rem;
+    }
+
+    .stackly-user-kv span:first-child{color:var(--mut)}
+    .stackly-user-kv span:last-child,
+    .stackly-user-kv b{text-align:right;word-break:break-word}
+
+    /* ---------- product cards ---------- */
+    .stackly-user-grid{display:grid;gap:18px;grid-template-columns:repeat(3,minmax(0,1fr))}
+
+    .stackly-user-card{
+        background:var(--card);
+        border:1px solid var(--bd);
+        border-radius:22px;
+        padding:16px;
+        transition:border-color .3s,transform .3s;
+        display:flex;
+        flex-direction:column;
+    }
+
+    .stackly-user-card:hover{border-color:var(--ac);transform:translateY(-3px)}
+
+    .stackly-user-card .stackly-user-img{
+        aspect-ratio:4/3;
+        border-radius:14px;
+        overflow:hidden;
+        margin-bottom:12px;
+        background:var(--s2);
+        display:grid;
+        place-items:center;
+        font-size:2.4rem;
+    }
+
+    .stackly-user-card .stackly-user-img img{width:100%;height:100%;object-fit:cover}
+
+    .stackly-user-tag{color:var(--ac);font-size:.85rem;font-weight:700}
+
+    .stackly-user-row{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:10px;
+        margin-top:auto;
+        padding-top:10px;
+        flex-wrap:wrap;
+    }
+
+    .stackly-user-row b{font:800 1.15rem "Bricolage Grotesque",sans-serif}
+    .stackly-user-acts{display:flex;gap:8px;flex-wrap:wrap}
+
+    /* ---------- quick actions ---------- */
+    .stackly-user-qa{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+
+    .stackly-user-qb{
+        display:grid;
+        gap:2px;
+        text-align:left;
+        padding:14px 16px;
+        border-radius:14px;
+        border:1px solid var(--bd);
+        background:var(--s);
+        cursor:pointer;
+        transition:border-color .25s,transform .25s;
+    }
+
+    .stackly-user-qb:hover{border-color:var(--ac);transform:translateY(-2px)}
+    .stackly-user-qb b{font:800 1.05rem "Bricolage Grotesque",sans-serif}
+    .stackly-user-qb small{font-size:.82rem}
+
+    /* ---------- bars and chart ---------- */
+    .stackly-user-bar{
+        height:9px;
+        background:#ffffff1f;
+        border-radius:9px;
+        overflow:hidden;
+        margin:8px 0 6px;
+    }
+
+    .stackly-user-bar i{display:block;height:100%;background:var(--grad);border-radius:9px}
+
+    .stackly-user-chart{display:flex;align-items:stretch;gap:10px;height:190px}
+
+    .stackly-user-chart div{
+        flex:1;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:4px;
+        min-width:0;
+    }
+
+    .stackly-user-chart em{flex:1;width:100%;display:flex;align-items:flex-end}
+    .stackly-user-chart i{display:block;width:100%;border-radius:8px 8px 4px 4px;background:var(--grad)}
+    .stackly-user-chart small{font-size:.78rem}
+    .stackly-user-chart b{font-size:.9rem}
+
+    /* ---------- todo, news, help ---------- */
+    .stackly-user-todo{display:grid;gap:8px;margin-top:14px}
+
+    .stackly-user-todo li{
+        display:flex;
+        gap:12px;
+        align-items:center;
+        padding:10px 12px;
+        border-radius:14px;
+        border:1px solid var(--bd);
+    }
+
+    .stackly-user-todo li i{
+        width:22px;height:22px;
+        border-radius:50%;
+        border:2px solid var(--bd);
+        display:grid;
+        place-items:center;
+        font-style:normal;
+        font-size:.75rem;
+        flex-shrink:0;
+    }
+
+    .stackly-user-todo li.stackly-user-done i{background:var(--ac);border-color:var(--ac);color:#0f2a43}
+    .stackly-user-todo li.stackly-user-done .stackly-user-tl{text-decoration:line-through;opacity:.65}
+
+    .stackly-user-tl{background:none;border:0;text-align:left;cursor:pointer;flex:1;font-weight:500}
+    .stackly-user-tl:hover{color:var(--ac)}
+
+    .stackly-user-news{display:grid;gap:14px}
+    .stackly-user-news li{padding-left:14px;border-left:2px solid var(--pk)}
+    .stackly-user-news small{display:block;color:var(--pk);font-weight:700}
+    .stackly-user-news b{display:block}
+
+    .stackly-user-help{
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        padding:12px 0;
+        border-bottom:1px solid var(--bd);
+        transition:color .2s;
+    }
+
+    .stackly-user-help:hover{color:var(--ac)}
+    .stackly-user-help span:last-child{color:var(--mut);font-size:.85rem}
+
+    .stackly-user-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:12px;
+    }
+
+    .stackly-user-head h3{margin:0}
+
+    /* ---------- filter chips ---------- */
+    .stackly-user-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+
+    .stackly-user-fc{
+        padding:7px 16px;
+        border-radius:999px;
+        border:1px solid var(--bd);
+        background:none;
+        cursor:pointer;
+        font-weight:700;
+        font-size:.9rem;
+        transition:.25s;
+    }
+
+    .stackly-user-fc:hover,
+    .stackly-user-fc.stackly-user-on{border-color:var(--ac);color:var(--ac)}
+    .stackly-user-fc.stackly-user-on{background:#ff7a451f}
+
+    /* ---------- forms ---------- */
+    .stackly-user-form{display:grid;gap:14px;max-width:480px}
+    .stackly-user-form label{display:grid;gap:6px;font-weight:400;font-size:.92rem;color:var(--mut)}
+
+    .stackly-user-form input,
+    .stackly-user-form select{
+        width:100%;
+        padding:14px 18px;
+        border-radius:14px;
+        border:1px solid var(--bd);
+        background:var(--s);
+        color:#fff;
+        font-size:15px;
+        transition:.25s;
+    }
+
+    .stackly-user-form input::placeholder{color:#8f84bd}
+    .stackly-user-form input:focus,
+    .stackly-user-form select:focus{outline:0;border-color:var(--ac)}
+    .stackly-user-form input[readonly]{opacity:.65}
+
+    select option{background:var(--modal);color:#fff}
+
+    .stackly-user-form .stackly-user-btn{justify-self:start}
+    .stackly-user-msg{min-height:1.4em;font-weight:700;color:var(--ac)}
+
+    /* ---------- preferences ---------- */
+    .stackly-user-pref{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:16px;
+        padding:12px 0;
+        border-bottom:1px solid var(--bd);
+    }
+
+    .stackly-user-pref b{display:block}
+
+    .stackly-user-sw{position:relative;width:46px;height:26px;flex-shrink:0}
+
+    .stackly-user-sw input{
+        position:absolute;
+        inset:0;
+        width:100%;height:100%;
+        opacity:0;
+        cursor:pointer;
+        margin:0;
+    }
+
+    .stackly-user-sw span{
+        position:absolute;
+        inset:0;
+        border-radius:26px;
+        background:#ffffff2e;
+        transition:.25s;
+        pointer-events:none;
+    }
+
+    .stackly-user-sw span::after{
+        content:"";
+        position:absolute;
+        left:3px;top:3px;
+        width:20px;height:20px;
+        border-radius:50%;
+        background:#fff;
+        transition:.25s;
+    }
+
+    .stackly-user-sw input:checked+span{background:var(--grad)}
+    .stackly-user-sw input:checked+span::after{transform:translateX(20px)}
+    .stackly-user-sw input:focus-visible+span{outline:3px solid var(--ac);outline-offset:3px}
+
+    .stackly-user-empty{padding:22px 8px;color:var(--mut)}
+
+    .stackly-user-empty a,
+    .stackly-user-lnk{color:var(--ac);font-weight:700;cursor:pointer}
+
+    .stackly-user-empty a:hover,
+    .stackly-user-lnk:hover{text-decoration:underline}
+
+    /* ---------- modal ---------- */
+    .stackly-user-modal-overlay{
+        position:fixed;
+        inset:0;
+        background:rgba(15,42,67,.72);
+        backdrop-filter:blur(3px);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:999;
+        opacity:0;
+        pointer-events:none;
+        transition:opacity .25s;
+        padding:20px;
+    }
+
+    .stackly-user-modal-overlay.stackly-user-show{opacity:1;pointer-events:auto}
+
+    .stackly-user-modal-box{
+        background:var(--modal);
+        border:1px solid var(--bd);
+        border-radius:22px;
+        padding:40px 36px 32px;
+        max-width:400px;
+        width:100%;
+        text-align:center;
+        transform:translateY(14px) scale(.97);
+        transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+        box-shadow:0 30px 70px rgba(0,0,0,.5);
+    }
+
+    .stackly-user-modal-overlay.stackly-user-show .stackly-user-modal-box{transform:none}
+
+    .stackly-user-modal-icon{
+        width:64px;height:64px;
+        border-radius:50%;
+        background:rgba(255,138,155,.14);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        margin:0 auto 20px;
+    }
+
+    .stackly-user-modal-icon svg{
+        width:30px;height:30px;
+        stroke:var(--bad);
+        fill:none;
+        stroke-width:2;
+        stroke-linecap:round;
+        stroke-linejoin:round;
+    }
+
+    .stackly-user-modal-box h2{font-size:24px;margin-bottom:10px}
+    .stackly-user-modal-box p{font-size:14.5px;line-height:1.55;margin-bottom:24px}
+    .stackly-user-modal-actions{display:flex;gap:10px}
+    .stackly-user-modal-actions .stackly-user-btn{flex:1}
+
+    /* ---------- responsive ---------- */
+    /* children of grids/flex must be allowed to shrink so tables scroll inside their wrapper instead of widening the page */
+    .stackly-user-dash>*,
+    .stackly-user-dgrid>*,
+    .stackly-user-stats>*,
+    .stackly-user-panel{min-width:0;max-width:100%}
+    .stackly-user-main{width:100%;max-width:100vw}
+    .stackly-user-tw{max-width:100%;-webkit-overflow-scrolling:touch}
+
+    @media(max-width:1100px){
+        .stackly-user-stats,
+        .stackly-user-qa{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .stackly-user-dgrid{grid-template-columns:minmax(0,1fr)}
+        .stackly-user-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .stackly-user-main{padding:22px 24px 44px}
+    }
+
+    @media(max-width:900px){
+        .stackly-user-dash{grid-template-columns:minmax(0,1fr)}
+
+        .stackly-user-sidebar{
+            position:fixed;
+            left:0;top:0;bottom:0;
+            width:270px;
+            max-width:86vw;
+            transform:translateX(-102%);
+            transition:transform .3s;
+        }
+
+        .stackly-user-sidebar.stackly-user-show{transform:none}
+
+        .stackly-user-mbtn{
+            display:grid;
+            place-items:center;
+            width:40px;height:40px;
+            border-radius:12px;
+            border:1px solid var(--bd);
+            background:var(--card);
+            font-size:1.2rem;
+            cursor:pointer;
+            flex-shrink:0;
+        }
+
+        .stackly-user-sclose{
+            display:block;
+            align-self:flex-end;
+            background:none;
+            border:0;
+            font-size:1.3rem;
+            cursor:pointer;
+            padding:4px 8px;
+        }
+
+        .stackly-user-backdrop.stackly-user-show{
+            display:block;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.55);
+            z-index:40;
+        }
+
+        .stackly-user-main{padding:18px 18px 40px}
+        .stackly-user-topbar{gap:12px;margin-bottom:20px}
+        .stackly-user-pn{display:none}
+        .stackly-user-chip{padding:5px}
+    }
+
+    @media(max-width:600px){
+        .stackly-user-stats{gap:12px}
+        .stackly-user-grid{grid-template-columns:minmax(0,1fr)}
+        .stackly-user-topbar{flex-wrap:wrap}
+        .stackly-user-search{order:3;flex-basis:100%;max-width:none}
+        .stackly-user-bell{display:none}
+        .stackly-user-stat,
+        .stackly-user-panel{padding:16px}
+        .stackly-user-tw table{min-width:420px}
+        .stackly-user-tw th,
+        .stackly-user-tw td{padding:10px 6px;font-size:.88rem}
+        .stackly-user-chart{height:160px;gap:6px}
+        .stackly-user-form .stackly-user-btn{justify-self:stretch}
+        .stackly-user-toast{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+        .stackly-user-modal-box{padding:32px 22px 26px}
+    }
+
+    @media(max-width:380px){
+        .stackly-user-stats,
+        .stackly-user-qa{grid-template-columns:minmax(0,1fr)}
+        .stackly-user-main{padding:14px 12px 32px}
+        .stackly-user-kv{flex-direction:column;gap:2px;align-items:flex-start}
+        .stackly-user-kv b,
+        .stackly-user-kv span:last-child{text-align:left}
+    }
+
+    /* ---------- in-page select dropdown (stays inside the screen) ---------- */
+    .stackly-user-dd{
+        position:fixed;
+        z-index:9500;
+        margin:0;
+        padding:6px;
+        list-style:none;
+        overflow-y:auto;
+        overscroll-behavior:contain;
+        box-sizing:border-box;
+        background:var(--modal,var(--s,#16385a));
+        color:var(--tx,#f5f8ff);
+        border:1px solid var(--ac,#ff7a45);
+        border-radius:14px;
+        box-shadow:0 18px 40px rgba(0,0,0,.45);
+        font:inherit;
+        font-size:15px;
+    }
+    .stackly-user-dd li{
+        padding:10px 12px;
+        border-radius:9px;
+        cursor:pointer;
+        overflow-wrap:anywhere;
+    }
+    .stackly-user-dd li.stackly-user-hl{background:rgba(10,108,255,.35)}
+    .stackly-user-dd li[aria-selected="true"]{color:var(--ac,#ff7a45);font-weight:600}
+    .stackly-user-dd li[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+
+/* ==========================================================
+   INDEX THEME OVERRIDES (Stackly Orthopedic Hospital)
+   Light mist canvas, white cards, ink sidebar, sun-yellow
+   pill buttons, indigo accents, Bricolage + Figtree type.
+   ========================================================== */
+body{background:var(--mist);color:var(--tx);font-family:var(--body);line-height:1.65}
+h1,h2,h3{font-family:var(--head);color:var(--ink);letter-spacing:-.025em}
+h1{font-weight:800}
+p,small{color:var(--mut)}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:6px}
+.stackly-user-bg{background:var(--mist)}
+.stackly-user-dash{background:var(--mist)}
+
+/* buttons (index .btn / .btn.ghost.dk) */
+.stackly-user-btn{background:var(--sun);color:var(--ink);font-weight:700;border:0}
+.stackly-user-btn:hover{box-shadow:0 14px 34px rgba(255,122,69,.4);transform:none}
+.stackly-user-btn.stackly-user-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.stackly-user-btn.stackly-user-ghost:hover{border-color:var(--indigo);color:var(--indigo);box-shadow:none}
+
+/* sidebar: dark ink panel like index .side */
+.stackly-user-sidebar{
+    background:var(--ink);border-right:0;color:#cfe0f5;
+    --tx:#ffffff;--mut:#9fb6d0;--card:rgba(255,255,255,.06);--bd:rgba(255,255,255,.14);--s2:rgba(255,255,255,.1);
+}
+.stackly-user-suser{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+.stackly-user-sname{color:#fff}
+.stackly-user-semail{color:#9fb6d0}
+.stackly-user-srole,.stackly-user-tier{color:var(--sun)}
+.stackly-user-nav a{color:#cfe0f5;font-weight:600;border-radius:14px}
+.stackly-user-nav a:hover,.stackly-user-nav a.stackly-user-on{background:rgba(255,255,255,.1);color:#fff}
+.stackly-user-nlabel{color:#9fb6d0}
+.stackly-user-logout{color:#fff;border:1.5px solid rgba(255,255,255,.4);background:transparent}
+.stackly-user-logout:hover{border-color:var(--sun);color:var(--sun)}
+.stackly-user-sclose{color:#fff}
+.stackly-user-wm{color:#fff}
+
+/* top bar */
+.stackly-user-bell,.stackly-user-rb,.stackly-user-chipp,.stackly-user-chip,.stackly-user-mbtn{
+    background:#fff;border:1px solid var(--line);color:var(--ink);
+}
+.stackly-user-mbtn{background:var(--ink);color:#fff;border:0}
+.stackly-user-av{background:var(--indigo);color:#fff}
+.stackly-user-pname,.stackly-user-pn{color:var(--ink)}
+.stackly-user-dot{background:var(--rose)}
+
+/* cards / stats / panels (index .card .kpi .box) */
+.stackly-user-stat,.stackly-user-panel,.stackly-user-card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--r);
+}
+.stackly-user-stat:hover,.stackly-user-panel:hover,.stackly-user-card:hover{
+    border-color:transparent;box-shadow:0 30px 60px rgba(15,42,67,.12);
+}
+.stackly-user-num{font-family:var(--head);color:var(--ink)}
+.stackly-user-lbl{color:var(--mut)}
+.stackly-user-up{color:#178a4c}
+.stackly-user-ic2{color:var(--ink)}
+.stackly-user-card .stackly-user-img{background:var(--mist)}
+.stackly-user-tag{color:var(--indigo)}
+.stackly-user-row b,.stackly-user-qb b,.stackly-user-kv b,.stackly-user-chart b{color:var(--ink)}
+.stackly-user-qb{background:var(--mist);border:1px solid var(--line)}
+.stackly-user-qb:hover{border-color:var(--indigo)}
+
+/* tables (index table / .badge) */
+.stackly-user-tw th{background:var(--mist);color:var(--ink);font-family:var(--head);font-weight:700}
+.stackly-user-tw td{color:var(--tx)}
+.stackly-user-status{background:rgba(10,108,255,.1);color:var(--indigo)}
+.stackly-user-status.stackly-user-ok{background:rgba(46,204,113,.15);color:#178a4c}
+.stackly-user-status.stackly-user-warn{background:rgba(255,122,69,.25);color:#9a6700}
+.stackly-user-status.stackly-user-off{background:rgba(15,42,67,.07);color:var(--mut)}
+
+/* meters + chart (indigo to sky, as index .meter / .bars) */
+.stackly-user-bar{background:var(--mist)}
+.stackly-user-bar i{background:linear-gradient(90deg,var(--indigo),var(--sky))}
+.stackly-user-chart i{background:linear-gradient(var(--indigo),var(--sky))}
+
+/* user-dashboard extras */
+.stackly-user-todo li.stackly-user-done i{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.stackly-user-tl:hover,.stackly-user-help:hover,.stackly-user-lnk,.stackly-user-empty a{color:var(--indigo)}
+.stackly-user-news li{border-left-color:var(--rose)}
+.stackly-user-news small{color:#c0304f}
+.stackly-user-msg{color:#178a4c}
+.stackly-user-fc{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.stackly-user-fc:hover,.stackly-user-fc.stackly-user-on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.stackly-user-sw span{background:rgba(15,42,67,.2)}
+.stackly-user-sw input:checked+span{background:var(--indigo)}
+.stackly-user-form label{color:var(--ink);font-weight:600}
+.stackly-user-tab .stackly-user-kv{color:var(--tx)}
+
+
+    /* inputs: white, 1.5px line border, indigo focus ring (index .field) */
+    .stackly-user-form input,.stackly-user-form select,.stackly-user-search input,.stackly-user-ts{
+        background:#fff!important;color:var(--ink)!important;
+        border:1.5px solid var(--line)!important;border-radius:14px;
+    }
+    :is(.stackly-user-form input,.stackly-user-form select,.stackly-user-search input,.stackly-user-ts):focus{outline:0;border-color:var(--indigo)!important;box-shadow:0 0 0 4px rgba(10,108,255,.15)!important}
+    input::placeholder{color:#9a9eb8!important}
+    select option{background:#fff;color:var(--ink)}
+
+/* toast, modal, dropdown */
+.stackly-user-toast{background:var(--ink);color:#fff;border:0;box-shadow:0 20px 50px rgba(15,42,67,.35)}
+.stackly-user-modal-overlay{background:rgba(15,42,67,.6)}
+.stackly-user-modal-box{background:#fff;border:0;border-radius:28px;box-shadow:0 30px 70px rgba(15,42,67,.25)}
+.stackly-user-modal-box h2{color:var(--ink)}
+.stackly-user-modal-icon{background:rgba(255,90,95,.16)}
+.stackly-user-dd{background:#fff;color:var(--ink);border:1.5px solid var(--indigo);box-shadow:0 18px 40px rgba(15,42,67,.18)}
+.stackly-user-dd li.stackly-user-hl{background:rgba(10,108,255,.12)}
+.stackly-user-dd li[aria-selected="true"]{color:var(--indigo)}
+
+</style>
+</head>
+<body>
+
+    <div class="stackly-user-bg"></div>
+    <div class="stackly-user-dash">
+        <aside class="stackly-user-sidebar" id="sb">
+            <button class="stackly-user-sclose" id="sc" aria-label="Close menu">&#10005;</button>
+            <a href="index.html" class="stackly-user-slogo"><img src="./stackly.png" alt="Stackly Orthopedic Hospital" /></a>
+            <div class="stackly-user-suser"><div class="stackly-user-sname" data-name></div><div class="stackly-user-semail" data-email></div><span class="stackly-user-tier" id="badge">Basic OPD</span></div>
+            <nav class="stackly-user-nav" id="nav">
+                <div class="stackly-user-nlabel">Dashboard</div>
+                <a href="#overview" data-tab="overview"><span class="stackly-user-ic">&#9632;</span> Overview</a>
+                <div class="stackly-user-nlabel">Care</div>
+                <a href="#bookings" data-tab="bookings"><span class="stackly-user-ic">&#9670;</span> My appointments</a>
+                <a href="#book" data-tab="book"><span class="stackly-user-ic">&#9733;</span> Book an appointment</a>
+                <a href="#plan" data-tab="plan"><span class="stackly-user-ic">&#8377;</span> Care plan and bills</a>
+                <a href="#community" data-tab="community"><span class="stackly-user-ic">&#9825;</span> Health programs</a>
+                <div class="stackly-user-nlabel">Account</div>
+                <a href="#settings" data-tab="settings"><span class="stackly-user-ic">&#9998;</span> Settings</a>
+                <div class="stackly-user-nlabel">Website</div>
+                <a href="index.html"><span class="stackly-user-ic">&larr;</span> Back to site</a>
+            </nav>
+            <div class="stackly-user-sfoot"><button class="stackly-user-logout" id="out">Log out</button></div>
+        </aside>
+        <div class="stackly-user-backdrop" id="bd"></div>
+        <main class="stackly-user-main">
+            <div class="stackly-user-topbar">
+                <button class="stackly-user-mbtn" id="mb" aria-label="Open menu">&#9776;</button>
+                <div class="stackly-user-search"><input type="search" id="q" placeholder="Search appointments, services..." aria-label="Search" /></div>
+                <div class="stackly-user-tr"><button type="button" class="stackly-user-rb" data-go="book" aria-label="Book an appointment">&#128197;</button><button class="stackly-user-rb stackly-user-bell" id="bell" aria-label="Notifications">&#128276;<span class="stackly-user-dot"></span></button><div class="stackly-user-chip"><div class="stackly-user-av" data-av>U</div><div class="stackly-user-pn" data-name></div></div></div>
+            </div>
+            <div class="stackly-user-pagehead"><h1 id="pt"></h1><p id="ps"></p></div>
+
+            <section class="stackly-user-tab" id="tab-overview">
+                <div class="stackly-user-stats">
+                    <div class="stackly-user-stat"><div class="stackly-user-ic2" style="background:var(--ac)">&#9670;</div><div class="stackly-user-num" id="nP">-</div><div class="stackly-user-lbl" id="nPs">Current care plan</div></div>
+                    <div class="stackly-user-stat"><div class="stackly-user-ic2" style="background:var(--pk)">&#9201;</div><div class="stackly-user-num" id="nM">0</div><div class="stackly-user-lbl" id="nMs">Physio hours left</div></div>
+                    <div class="stackly-user-stat"><div class="stackly-user-ic2" style="background:#a9a4ff">&#128197;</div><div class="stackly-user-num" id="nB">0</div><div class="stackly-user-lbl">Upcoming appointments</div></div>
+                    <div class="stackly-user-stat"><div class="stackly-user-ic2" style="background:var(--blue)">&#9733;</div><div class="stackly-user-num" id="nD">0</div><div class="stackly-user-lbl">Hospital visits this month</div></div>
+                </div>
+                <div class="stackly-user-panel"><h3>Quick actions</h3>
+                    <div class="stackly-user-qa">
+                        <button type="button" class="stackly-user-qb" data-go="book"><b>Book an appointment</b><small>Consult, physio, imaging</small></button>
+                        <button type="button" class="stackly-user-qb" data-go="bookings"><b>My appointments</b><small>Review or cancel</small></button>
+                        <button type="button" class="stackly-user-qb" data-go="plan"><b>Care plan and bills</b><small>Change plan, pay</small></button>
+                        <button type="button" class="stackly-user-qb" data-go="community"><b>Health programs</b><small>Camps and talks</small></button>
+                    </div>
+                </div>
+                <div class="stackly-user-dgrid">
+                    <div class="stackly-user-panel"><h3>Upcoming appointments</h3><div class="stackly-user-tw"><table><thead><tr><th>Date</th><th>Service</th><th>Duration</th><th>Status</th></tr></thead><tbody id="ovRows"></tbody></table></div></div>
+                    <div class="stackly-user-panel"><h3>Your account</h3>
+                        <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+                            <div class="stackly-user-av stackly-user-big" data-av>U</div>
+                            <div style="width:100%">
+                                <div class="stackly-user-kv"><span>Name</span><span data-name></span></div>
+                                <div class="stackly-user-kv"><span>Plan</span><span id="ovPlan"></span></div>
+                                <div class="stackly-user-kv"><span>Insurance</span><span id="ovCo">&mdash;</span></div>
+                                <div class="stackly-user-kv"><span>Next review</span><span id="ovRen">&mdash;</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stackly-user-dgrid">
+                    <div class="stackly-user-panel"><h3>Hospital visits, last 6 months</h3><div class="stackly-user-chart" id="chart"></div></div>
+                    <div class="stackly-user-panel"><h3>Getting started</h3><div class="stackly-user-bar"><i id="gsBar" style="width:0"></i></div><small id="gsTxt"></small><ul class="stackly-user-todo" id="todo"></ul></div>
+                </div>
+                <div class="stackly-user-dgrid">
+                    <div class="stackly-user-panel"><h3>Announcements</h3><ul class="stackly-user-news" id="news"></ul></div>
+                    <div class="stackly-user-panel"><h3>Help and resources</h3>
+                        <a class="stackly-user-help" href="contact.html"><span>Talk to our patient care team</span><span>Contact</span></a>
+                        <a class="stackly-user-help" href="faq.html"><span>Visiting hours, reports and insurance</span><span>Read</span></a>
+                        <a class="stackly-user-help" href="index.html"><span>Meet our doctors</span><span>Explore</span></a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stackly-user-tab" id="tab-bookings">
+                <div class="stackly-user-panel">
+                    <div class="stackly-user-head"><h3>All appointments</h3><button class="stackly-user-btn stackly-user-ghost stackly-user-sm" id="exp">Download CSV</button></div>
+                    <div class="stackly-user-chips" id="of"></div>
+                    <div class="stackly-user-tw"><table><thead><tr><th>Date</th><th>Service</th><th>Duration</th><th>Est. cost</th><th>Status</th><th></th></tr></thead><tbody id="bRows"></tbody></table></div>
+                </div>
+            </section>
+
+            <section class="stackly-user-tab" id="tab-book">
+                <div class="stackly-user-panel"><h3>Book an appointment</h3>
+                    <form class="stackly-user-form" id="fBook">
+                        <label>Date<input name="d" type="date" required /></label>
+                        <label>Duration (hours)<input name="h" type="number" min="1" max="4" value="1" required /></label>
+                        <label>Service<select name="s" id="bSpace"></select></label>
+                        <button class="stackly-user-btn">Confirm appointment</button>
+                        <div class="stackly-user-msg" id="bMsg"></div>
+                    </form>
+                </div>
+                <div class="stackly-user-panel"><h3>Services you can book</h3><div class="stackly-user-grid" id="spGrid"></div></div>
+            </section>
+
+            <section class="stackly-user-tab" id="tab-plan">
+                <div class="stackly-user-stats">
+                    <div class="stackly-user-stat"><div class="stackly-user-num" id="pN">-</div><div class="stackly-user-lbl">Current plan</div></div>
+                    <div class="stackly-user-stat"><div class="stackly-user-num" id="pF">-</div><div class="stackly-user-lbl">Package fee</div></div>
+                    <div class="stackly-user-stat"><div class="stackly-user-num" id="pM">0</div><div class="stackly-user-lbl" id="pMs">Physio hours left</div></div>
+                    <div class="stackly-user-stat"><div class="stackly-user-num" id="pR">-</div><div class="stackly-user-lbl">Next review</div></div>
+                </div>
+                <div class="stackly-user-panel"><h3>Change care plan</h3><div class="stackly-user-grid" id="plGrid"></div></div>
+                <div class="stackly-user-panel"><h3>Bills</h3><div class="stackly-user-tw"><table><thead><tr><th>Bill no.</th><th>Month</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody id="iRows"></tbody></table></div></div>
+            </section>
+
+            <section class="stackly-user-tab" id="tab-community">
+                <div class="stackly-user-panel"><h3>This week at the hospital</h3><div class="stackly-user-grid" id="evGrid"></div></div>
+            </section>
+
+            <section class="stackly-user-tab" id="tab-settings">
+                <div class="stackly-user-panel"><h3>Your profile</h3>
+                    <form class="stackly-user-form" id="fProf">
+                        <label>Name<input name="n" required /></label>
+                        <label>Email (sign-in ID)<input name="e" readonly /></label>
+                        <label>Phone<input name="p" type="tel" placeholder="+91" /></label>
+                        <label>Insurance / TPA<input name="c" placeholder="Optional" /></label>
+                        <button class="stackly-user-btn">Save settings</button>
+                        <div class="stackly-user-msg" id="pMsg"></div>
+                    </form>
+                </div>
+                <div class="stackly-user-dgrid">
+                    <div class="stackly-user-panel"><h3>Notifications</h3><div id="prefs"></div></div>
+                    <div class="stackly-user-panel"><h3>Security</h3>
+                        <form class="stackly-user-form" id="fPass" autocomplete="off">
+                            <label>Current password<input name="c" type="password" autocomplete="current-password" required /></label>
+                            <label>New password<input name="n" type="password" minlength="6" autocomplete="new-password" required /></label>
+                            <label>Confirm new password<input name="r" type="password" minlength="6" autocomplete="new-password" required /></label>
+                            <button class="stackly-user-btn">Update password</button>
+                            <div class="stackly-user-msg" id="passMsg"></div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="stackly-user-modal-overlay" id="modalOverlay" aria-hidden="true">
+        <div class="stackly-user-modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="stackly-user-modal-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+            <h2 id="modalTitle"></h2><p id="modalMsg"></p>
+            <div class="stackly-user-modal-actions"><button type="button" class="stackly-user-btn stackly-user-ghost" id="modalCancelBtn">Cancel</button><button type="button" class="stackly-user-btn" id="modalOkBtn">Confirm</button></div>
+        </div>
+    </div>
+
+<script>
+(function(){'use strict';
+const ROLE='user';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const norm=e=>String(e||'').trim().toLowerCase();
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+const inr=n=>'₹'+Math.round(+n||0).toLocaleString('en-IN');
+const fd=d=>d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';
+const set=(id,v)=>{const e=$('#'+id);if(e)e.textContent=v};
+const enc=s=>{try{return btoa(s)}catch(e){return ''}};
+const DB={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){localStorage.setItem(k,JSON.stringify(v))}};
+const users=()=>DB.get('stackly_users',[]);
+const bk=e=>DB.get('stackly_bookings_'+e,[]);
+const today=()=>new Date().toISOString().slice(0,10);
+/* Auth: same storage as login (stackly_users with btoa passwords, stackly_session object) */
+const S=DB.get('stackly_session',null);
+const U=S&&users().find(u=>norm(u.email)===norm(S.email));
+if(!U){location.replace('login.html');return}
+if(U.role!==ROLE){location.replace(U.role==='admin'?'admin.html':'dashboard.html');return}
+const ME=norm(U.email);
+const saveU=f=>{const l=users(),m=l.find(x=>norm(x.email)===ME);if(!m)return;f(m);DB.set('stackly_users',l);Object.assign(U,m)};
+const toast=m=>{const t=document.createElement('div');t.className='stackly-user-toast';t.textContent=m;document.body.appendChild(t);requestAnimationFrame(()=>t.classList.add('stackly-user-show'));setTimeout(()=>{t.classList.remove('stackly-user-show');setTimeout(()=>t.remove(),400)},2600)};
+const ov=$('#modalOverlay');let onYes=null;
+const closeModal=()=>{ov.classList.remove('stackly-user-show');ov.setAttribute('aria-hidden','true');onYes=null};
+const ask=(t,m,y)=>{$('#modalTitle').textContent=t;$('#modalMsg').textContent=m;onYes=y;ov.classList.add('stackly-user-show');ov.setAttribute('aria-hidden','false');setTimeout(()=>$('#modalOkBtn').focus(),60)};
+$('#modalOkBtn').onclick=()=>{const f=onYes;closeModal();f&&f()};
+$('#modalCancelBtn').onclick=closeModal;
+ov.onclick=e=>{if(e.target===ov)closeModal()};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&onYes)closeModal()});
+const csv=(name,rows)=>{const t=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href)};
+const none=(n,t)=>`<tr><td colspan="${n}" class="stackly-user-empty">${t}</td></tr>`;
+const paint=()=>{$$('[data-name]').forEach(e=>e.textContent=U.name);$$('[data-email]').forEach(e=>{e.textContent=U.email;e.title=U.email});$$('[data-av]').forEach(e=>e.textContent=(U.name||'U').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase())};
+paint();
+$$('img[src*="stackly.png"]').forEach(i=>{const w=()=>{const s=document.createElement('span');s.className='stackly-user-wm';s.textContent='Stackly Ortho';i.replaceWith(s)};i.onerror=w;if(i.complete&&!i.naturalWidth)w()});
+const closeSb=()=>{$('#sb').classList.remove('stackly-user-show');$('#bd').classList.remove('stackly-user-show')};
+const filter=v=>{v=norm(v);$$('.stackly-user-tab.stackly-user-open tbody tr,.stackly-user-tab.stackly-user-open .stackly-user-card').forEach(r=>r.style.display=!v||norm(r.textContent).includes(v)?'':'none')};
+function show(n){if(!T[n])n='overview';$$('.stackly-user-tab').forEach(p=>p.classList.toggle('stackly-user-open',p.id==='tab-'+n));$$('#nav a[data-tab]').forEach(a=>a.classList.toggle('#navON',a.dataset.tab===n));set('pt',T[n][0]);set('ps',T[n][1]);closeSb();$('#q').value='';filter('');if(location.hash!=='#'+n)history.replaceState(null,'','#'+n);scrollTo(0,0)}
+$$('#nav a[data-tab]').forEach(a=>a.onclick=e=>{e.preventDefault();show(a.dataset.tab)});
+$('#q').oninput=e=>filter(e.target.value);
+$('#mb').onclick=()=>{$('#sb').classList.add('stackly-user-show');$('#bd').classList.add('stackly-user-show')};
+$('#sc').onclick=$('#bd').onclick=closeSb;
+$('#out').onclick=()=>{localStorage.removeItem('stackly_session');location.href='login.html'};
+$('#bell').onclick=()=>toast('No new notifications.');
+
+const T={overview:['Hello, '+U.name.split(' ')[0],'Your appointments, care plan and health programs at a glance.'],bookings:['My appointments','Review, download or cancel your appointments.'],book:['Book an appointment','Consultations, physiotherapy and imaging.'],plan:['Care plan and bills','Your care package and billing.'],community:['Health programs','Camps, talks and support groups for patients.'],settings:['Settings','Keep your details up to date.']};
+const PLANS={'Basic OPD':[999,2,'Consultations and X-ray reviews, 2 physio hours'],'Physio Care':[3999,8,'Guided therapy, 8 physio hours'],'Joint Care':[9999,12,'Joint pain program, 12 physio hours'],'Post-surgery Care':[24999,20,'Rehab and follow-ups, 20 physio hours']};
+const SP=[['Physiotherapy session','🏃',600,'One-to-one therapy · per hour',1],['Orthopedic consultation','🩺',800,'Bone, joint and spine specialists · per hour',0],['Sports injury clinic','⚽',900,'Assessment and recovery plan · per hour',0],['Fracture clinic','🦴',700,'Cast, review and follow-up · per hour',0],['X-ray and imaging','🩻',700,'X-ray or MRI scan · per visit',0]];
+const EV=[['fri','🦴','Bone health camp','Sat · 10 am · OPD hall','Free bone density screening.'],['fin','🧘','Back pain workshop','Wed · 4 pm · Physio wing','Posture and exercise guidance.'],['chai','🏃','Sports injury talk','Fri · 5 pm · Seminar room','Prevention tips from our sports medicine team.'],['swap','🤝','Joint replacement support group','Mon · 5:30 pm · Lounge','Meet patients who have been through it.']];
+const NEWS=[['This week','Bone health camp','Saturday 10 am in the OPD hall. Free screening for patients.'],['Last week','New MRI unit','Orthopedic MRI is now available on the second floor.'],['This month','Physiotherapy wing extended','Evening physio slots now open until 8 pm.']];
+const DAYS=[1,2,2,3,2,4];
+const spOf=n=>SP.find(s=>s[0]===n)||[n,'📍',0,'',0];
+const mine=()=>bk(ME).map((b,i)=>({...b,i,status:b.status||'Confirmed'})).sort((a,b)=>a.date.localeCompare(b.date));
+const plan=()=>PLANS[U.plan]?U.plan:'Basic OPD';
+const used=()=>{const m=today().slice(0,7);return mine().filter(b=>b.status!=='Cancelled'&&b.date.startsWith(m)&&spOf(b.space)[4]).reduce((a,b)=>a+b.hours,0)};
+const left=()=>Math.max(0,PLANS[plan()][1]-used());
+const cost=b=>{const s=spOf(b.space);return s[2]*(s[0]==='X-ray and imaging'?1:b.hours)};
+const PL={Confirmed:'ok','Checked in':'ok',Cancelled:'off',Paid:'ok',Upcoming:'warn'};
+const pill=s=>`<span class="stackly-user-status${PL[s]?' stackly-user-'+PL[s]:''}">${esc(s)}</span>`;
+const renewal=()=>{const d=new Date();d.setMonth(d.getMonth()+1,1);return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})};
+const PR=()=>(DB.get('stackly_prefs',{})[ME])||{remind:true,inv:true,events:false};
+const RS=()=>(DB.get('stackly_rsvp',{})[ME])||[];
+const card=(e,t,tag,d,price,btns)=>`<div class="stackly-user-card"><div class="stackly-user-img">${e}</div><span class="stackly-user-tag">${esc(tag)}</span><h4>${esc(t)}</h4><p>${esc(d)}</p><div class="stackly-user-row"><b>${price}</b><div class="stackly-user-acts">${btns}</div></div></div>`;
+let OF='All';
+function render(){
+  const B=mine(),up=B.filter(b=>b.date>=today()&&b.status!=='Cancelled'),pn=plan(),P=PLANS[pn];
+  set('tier',pn);set('nP',pn);set('nPs','Next review '+renewal());set('nM',left());set('nMs','of '+P[1]+' physio hours left');
+  set('nB',up.length);set('nD',DAYS[5]);
+  set('ovPlan',pn);set('ovCo',U.company||'—');set('ovRen',renewal());
+  $('#ovRows').innerHTML=up.length?up.slice(0,4).map(b=>`<tr><td>${fd(b.date)}</td><td>${esc(b.space)}</td><td>${b.hours} hr</td><td>${pill(b.status)}</td></tr>`).join(''):none(4,'No upcoming appointments. <button type="button" class="stackly-user-tl" data-go="book">Book an appointment</button>');
+  const ms=[...Array(6)].map((_,i)=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-5+i);return d.toLocaleDateString('en',{month:'short'})});
+  $('#chart').innerHTML=DAYS.map((v,i)=>`<div><b>${v}</b><em><i style="height:${Math.max(4,v/16*100)}%"></i></em><small>${ms[i]}</small></div>`).join('');
+  const td=[[B.length>0,'Book your first appointment','book'],[RS().length>0,'Register for a health program','community'],[!!(U.phone&&U.company),'Add your phone and insurance','settings'],[!!U.plan,'Choose your plan','plan']],dn=td.filter(t=>t[0]).length;
+  $('#gsBar').style.width=dn/td.length*100+'%';set('gsTxt',dn+' of '+td.length+' steps done');
+  $('#todo').innerHTML=td.map(t=>`<li class="${t[0]?'stackly-user-done':''}"><i>${t[0]?'&#10003;':''}</i><button type="button" class="stackly-user-tl" data-go="${t[2]}">${t[1]}</button></li>`).join('');
+  $('#news').innerHTML=NEWS.map(n=>`<li><small>${n[0]}</small><b>${n[1]}</b><p>${n[2]}</p></li>`).join('');
+  const fl=['All','Upcoming','Past','Cancelled'];
+  $('#of').innerHTML=fl.map(f=>`<button type="button" class="stackly-user-fc${f===OF?' stackly-user-on':''}" data-of="${f}">${f}</button>`).join('');
+  const L=B.filter(b=>OF==='All'||(OF==='Upcoming'&&b.date>=today()&&b.status!=='Cancelled')||(OF==='Past'&&b.date<today()&&b.status!=='Cancelled')||(OF==='Cancelled'&&b.status==='Cancelled'));
+  $('#bRows').innerHTML=L.length?L.map(b=>`<tr><td>${fd(b.date)}</td><td>${esc(b.space)}</td><td>${b.hours} hr</td><td>${inr(cost(b))}</td><td>${pill(b.status)}</td><td>${b.status==='Confirmed'&&b.date>=today()?`<button class="stackly-user-btn stackly-user-ghost stackly-user-sm" data-cx="${b.i}">Cancel</button>`:''}</td></tr>`).join(''):none(6,'No appointments in this view.');
+  $('#bSpace').innerHTML=SP.map(s=>`<option>${s[0]}</option>`).join('');
+  $('#spGrid').innerHTML=SP.map(s=>card(s[1],s[0],s[4]?'Therapy':'Consultation',s[3],inr(s[2])+(s[0]==='X-ray and imaging'?' / visit':' / hr'),`<button class="stackly-user-btn stackly-user-sm" data-pick="${esc(s[0])}">Book this</button>`)).join('');
+  set('pN',pn);set('pF',inr(P[0]));set('pM',left());set('pMs','of '+P[1]+' physio hours left');set('pR',renewal());
+  $('#plGrid').innerHTML=Object.entries(PLANS).map(([n,v])=>card('🏢',n,n===pn?'Your plan':'Plan',v[2],inr(v[0])+' / package',n===pn?'<button class="stackly-user-btn stackly-user-ghost stackly-user-sm" disabled>Current</button>':`<button class="stackly-user-btn stackly-user-sm" data-plan="${n}">Switch</button>`)).join('');
+  const inv=[0,1,2,3].map(k=>{const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-k);return{id:'INV-'+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0'),m:d.toLocaleDateString('en-IN',{month:'short',year:'numeric'}),s:k?'Paid':'Upcoming'}});
+  $('#iRows').innerHTML=inv.map(v=>`<tr><td>${v.id}</td><td>${v.m}</td><td>${inr(P[0])}</td><td>${pill(v.s)}</td><td>${v.s==='Upcoming'?'<button class="stackly-user-btn stackly-user-sm" data-pay="1">Pay now</button>':''}</td></tr>`).join('');
+  const r=RS();
+  $('#evGrid').innerHTML=EV.map(e=>card(e[1],e[2],e[3],e[4],'Free',`<button class="stackly-user-btn stackly-user-sm${r.includes(e[0])?' stackly-user-ghost':''}" data-rsvp="${e[0]}">${r.includes(e[0])?'Going ✓':'RSVP'}</button>`)).join('');
+  const p=PR();
+  $('#prefs').innerHTML=[['remind','Appointment reminders','A nudge the evening before.'],['inv','Bills','When a new bill is ready.'],['events','Health program updates','Weekly health programs digest.']].map(x=>`<div class="stackly-user-pref"><div><b>${x[1]}</b><small>${x[2]}</small></div><label class="stackly-user-sw"><input type="checkbox" data-pref="${x[0]}" aria-label="${x[1]}"${p[x[0]]?' checked':''}><span></span></label></div>`).join('');
+  const E=$('#fProf').elements;E.n.value=U.name;E.e.value=U.email;E.p.value=U.phone||'';E.c.value=U.company||'';
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(d.go)return show(d.go);
+  if(d.of){OF=d.of;return render()}
+  if(d.pick){show('book');$('#bSpace').value=d.pick;return $('#fBook').elements.d.focus()}
+  if(d.cx!==undefined)ask('Cancel this appointment?','The slot will be released for other patients.',()=>{const l=bk(ME);if(l[+d.cx])l[+d.cx].status='Cancelled';DB.set('stackly_bookings_'+ME,l);render();toast('Appointment cancelled.')});
+  if(d.plan)ask('Switch to '+d.plan+'?','Your new package fee of '+inr(PLANS[d.plan][0])+' applies from the next review.',()=>{saveU(m=>m.plan=d.plan);render();toast('Plan changed to '+d.plan+'.')});
+  if(d.pay)toast('Payment page opens here once billing is connected.');
+  if(d.rsvp){const a=DB.get('stackly_rsvp',{}),l=a[ME]||[],i=l.indexOf(d.rsvp);i<0?l.push(d.rsvp):l.splice(i,1);a[ME]=l;DB.set('stackly_rsvp',a);render();toast(i<0?'You are on the list.':'RSVP removed.')}
+});
+$('#fBook').elements.d.min=today();
+$('#fBook').onsubmit=e=>{e.preventDefault();const E=e.target.elements,l=bk(ME);l.push({date:E.d.value,space:E.s.value,hours:+E.h.value,status:'Confirmed'});DB.set('stackly_bookings_'+ME,l);set('bMsg','Booked: '+E.s.value+' on '+fd(E.d.value)+'.');setTimeout(()=>set('bMsg',''),3000);e.target.reset();render();toast('Appointment confirmed.')};
+$('#exp').onclick=()=>{const B=mine();if(!B.length)return toast('No appointments to export yet.');csv('my-appointments.csv',[['Date','Service','Hours','Est. cost (INR)','Status'],...B.map(b=>[b.date,b.space,b.hours,cost(b),b.status])])};
+$('#fProf').onsubmit=e=>{e.preventDefault();const E=e.target.elements;saveU(m=>{m.name=E.n.value.trim()||m.name;m.phone=E.p.value.trim();m.company=E.c.value.trim()});paint();T.overview[0]='Hello, '+U.name.split(' ')[0];render();set('pMsg','Settings saved.');setTimeout(()=>set('pMsg',''),2500)};
+document.addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.pref;if(!k)return;const a=DB.get('stackly_prefs',{}),m=a[ME]||{remind:true,inv:true,events:false};m[k]=e.target.checked;a[ME]=m;DB.set('stackly_prefs',a);toast('Preference saved.')});
+$('#fPass').onsubmit=e=>{e.preventDefault();const E=e.target.elements;
+  if(enc(E.c.value)!==U.pass)return set('passMsg','Current password is incorrect.');
+  if(E.n.value.length<6)return set('passMsg','Use at least 6 characters.');
+  if(E.n.value!==E.r.value)return set('passMsg','New passwords do not match.');
+  saveU(m=>m.pass=enc(E.n.value));e.target.reset();set('passMsg','Password updated.');setTimeout(()=>set('passMsg',''),2500)};
+render();show(location.hash.slice(1)||'overview');
+
+})();
+</script>
+
+
+<script>
+/* In-page replacement for the native <select> popup so the list never leaves the screen. */
+(function () {
+  var list = null, cur = null, hl = -1;
+
+  function enabled(o) { return !o.disabled && !o.hidden; }
+
+  function close() {
+    if (list) { list.remove(); list = null; }
+    if (cur) { cur.setAttribute('aria-expanded', 'false'); cur = null; }
+    hl = -1;
+  }
+
+  function place() {
+    if (!list || !cur) return;
+    var r = cur.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight, m = 8;
+    var w = Math.min(Math.max(r.width, 160), vw - m * 2);
+    var left = Math.min(Math.max(r.left, m), vw - w - m);
+    list.style.width = w + 'px';
+    list.style.left = left + 'px';
+    list.style.maxHeight = '';
+    var below = vh - r.bottom - m - 4, above = r.top - m - 4, h = list.scrollHeight + 2;
+    if (h <= below || below >= above) {
+      list.style.top = (r.bottom + 4) + 'px';
+      list.style.bottom = 'auto';
+      list.style.maxHeight = Math.max(110, below) + 'px';
+    } else {
+      list.style.top = 'auto';
+      list.style.bottom = (vh - r.top + 4) + 'px';
+      list.style.maxHeight = Math.max(110, above) + 'px';
+    }
+  }
+
+  function setHl(i, scroll) {
+    var items = list ? list.children : [];
+    if (hl > -1 && items[hl]) items[hl].classList.remove('stackly-user-hl');
+    hl = i;
+    if (items[i]) {
+      items[i].classList.add('stackly-user-hl');
+      if (scroll !== false) items[i].scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function pick(i) {
+    if (!cur) return;
+    var sel = cur, o = sel.options[i];
+    if (!o || !enabled(o)) return;
+    var changed = sel.selectedIndex !== i;
+    sel.selectedIndex = i;
+    close();
+    sel.focus();
+    if (changed) {
+      sel.dispatchEvent(new Event('input', { bubbles: true }));
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
+
+  function open(sel) {
+    if (sel.disabled) return;
+    if (cur === sel) { close(); return; }
+    close();
+    cur = sel;
+    sel.setAttribute('aria-expanded', 'true');
+    list = document.createElement('ul');
+    list.className = 'stackly-user-dd';
+    list.setAttribute('role', 'listbox');
+    Array.prototype.forEach.call(sel.options, function (o, i) {
+      var li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.textContent = o.textContent;
+      if (i === sel.selectedIndex) li.setAttribute('aria-selected', 'true');
+      if (!enabled(o)) li.setAttribute('aria-disabled', 'true');
+      if (o.hidden) li.style.display = 'none';
+      li.addEventListener('mouseenter', function () { if (enabled(o)) setHl(i, false); });
+      li.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      li.addEventListener('click', function () { pick(i); });
+      list.appendChild(li);
+    });
+    document.body.appendChild(list);
+    place();
+    setHl(Math.max(sel.selectedIndex, 0));
+  }
+
+  function eligible(el) {
+    return el && el.tagName === 'SELECT' && !el.multiple && !(el.size > 1);
+  }
+
+  /* block the native popup, open ours instead */
+  function block(e) {
+    var s = e.target.closest ? e.target.closest('select') : null;
+    if (!eligible(s)) return;
+    e.preventDefault();
+    if (e.type === 'mousedown' || e.type === 'pointerdown') { s.focus(); }
+    if (e.type === 'click') open(s);
+  }
+  document.addEventListener('pointerdown', block, true);
+  document.addEventListener('mousedown', block, true);
+  document.addEventListener('click', block, true);
+
+  document.addEventListener('keydown', function (e) {
+    var s = e.target;
+    if (!eligible(s)) return;
+    if (!list || cur !== s) {
+      if (e.key === 'Enter' || e.key === ' ' || (e.altKey && e.key === 'ArrowDown')) { e.preventDefault(); open(s); }
+      return;
+    }
+    var n = s.options.length, i;
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    else if (e.key === 'Tab') { close(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(hl); }
+    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      var step = e.key === 'ArrowDown' ? 1 : -1;
+      for (i = hl + step; i >= 0 && i < n; i += step) { if (enabled(s.options[i])) { setHl(i); break; } }
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      i = e.key === 'Home' ? 0 : n - 1;
+      while (i >= 0 && i < n && !enabled(s.options[i])) i += e.key === 'Home' ? 1 : -1;
+      if (i >= 0 && i < n) setHl(i);
+    }
+  }, true);
+
+  document.addEventListener('pointerdown', function (e) {
+    if (!list) return;
+    if (list.contains(e.target) || e.target === cur) return;
+    close();
+  }, true);
+  window.addEventListener('resize', close);
+  window.addEventListener('scroll', function (e) {
+    if (list && !list.contains(e.target)) close();
+  }, true);
+  window.addEventListener('blur', close);
+})();
+</script>
+</body>
+</html>

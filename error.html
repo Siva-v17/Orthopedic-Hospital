@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page Unavailable | Stackly Orthopedic Hospital</title>
+<link rel="icon" href="./stackly.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f8ff;--teal:#0a6cff;--blue:#ff7a45;--text:#0f2a43;--mute:#566b80;--r:18px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Poppins',sans-serif;color:var(--text);background:var(--bg);display:grid;place-items:center;padding:24px;overflow-x:hidden;position:relative}
+.blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.45;z-index:0;animation:float 14s ease-in-out infinite alternate}
+.b1{width:420px;height:420px;background:#9cc7ff;top:-120px;left:-100px}
+.b2{width:380px;height:380px;background:#ffc2a8;bottom:-120px;right:-80px;animation-delay:-5s}
+@keyframes float{to{transform:translate(60px,40px) scale(1.12)}}
+.card{position:relative;z-index:1;width:100%;max-width:520px;background:#fff;border-radius:28px;padding:44px 36px;text-align:center;box-shadow:0 30px 70px rgba(15,42,67,.12);animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(30px)}}
+.logo img{height:40px;margin-bottom:26px}
+.code{font-size:clamp(4.5rem,16vw,6.5rem);font-weight:700;line-height:1;letter-spacing:-3px;background:linear-gradient(90deg,var(--teal),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-size:1.5rem;margin:14px 0 10px}
+p{color:var(--mute);font-size:.95rem;line-height:1.7}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.btn{display:inline-block;padding:12px 26px;border-radius:50px;font-weight:600;font-size:.95rem;text-decoration:none;transition:.3s;border:1.5px solid transparent;font-family:inherit;cursor:pointer}
+.btn.pri{background:linear-gradient(90deg,var(--teal),var(--blue));color:#fff;box-shadow:0 10px 24px rgba(10,108,255,.25)}
+.btn.pri:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(255,122,69,.3)}
+.btn.sec{background:#fff;color:var(--text);border-color:#dde5f0}
+.btn.sec:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+@media(max-width:480px){.card{padding:36px 22px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<main class="card">
+  <a href="index.html" class="logo"><img src="./stackly.png" alt="Stackly"></a>
+  <div class="code">Oops!</div>
+  <h1>This page isn't available right now</h1>
+  <p>The link you followed isn't connected yet. Please go back or return to the home page to continue exploring Stackly Orthopedic Hospital.</p>
+  <div class="actions">
+    <button type="button" class="btn sec" id="goBack">Go Back</button>
+    <a href="index.html" class="btn pri">Return to Home</a>
+  </div>
+</main>
+<script>
+document.getElementById('goBack').addEventListener('click', function () {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = 'index.html';
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin dashboard | Stackly Orthopedic Hospital</title>
+<link rel="icon" href="./stackly.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    /* ==========================================================
+       Stackly Orthopedic Hospital - dashboard styles
+       class prefix: stackly-admin-
+       ========================================================== */
+
+    :root{--bg:#f5f8ff;--bg2:#ffffff;--card:#ffffff;--teal:#0a6cff;--blue:#ff7a45;--text:#0f2a43;--mute:#566b80;--r:18px;--sp:clamp(48px,6vw,84px)}
+    :root{
+        /* legacy token names mapped onto the hospital theme above */
+        --ink:var(--text); --ink2:#16385a; --indigo:var(--teal); --sky:var(--blue); --sun:var(--blue); --rose:#ff5a5f;
+        --mist:var(--bg); --paper:var(--bg2); --line:rgba(15,42,67,.12);
+        --s:var(--bg2); --s2:#e8f0ff; --vi:var(--teal); --ac:var(--blue); --mint:var(--blue); --grad:var(--teal);
+        --pk:#ff5a5f; --hi:#8fbaff;
+        --tx:#1d3a55; --mut:var(--mute); --bd:rgba(15,42,67,.12);
+        --bad:#c0304f; --warn:#9a6700; --modal:#ffffff;
+        --head:'Bricolage Grotesque',system-ui,sans-serif; --body:'Figtree',system-ui,sans-serif;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+        font:400 1.0625rem/1.6 "Figtree",system-ui,sans-serif;
+        background:var(--bg);
+        color:var(--tx);
+        overflow-x:hidden;
+        -webkit-font-smoothing:antialiased;
+    }
+
+    img{max-width:100%;display:block}
+    a{color:inherit;text-decoration:none}
+    [hidden]{display:none!important}
+
+    h1,h2,h3{
+        font-family:"Bricolage Grotesque",sans-serif;
+        line-height:1.05;
+        font-weight:700;
+    }
+
+    h1{font-size:clamp(1.7rem,3.4vw,2.5rem)}
+    h3{font-size:1.2rem;margin-bottom:12px}
+
+    p,small{color:var(--mut)}
+    :focus-visible{outline:3px solid var(--ac);outline-offset:3px}
+
+    /* ---------- background ---------- */
+    .stackly-admin-bg{
+        position:fixed;
+        inset:0;
+        z-index:-1;
+        background:var(--bg);
+    }
+
+    .stackly-admin-wm{
+        font:800 1.7rem "Bricolage Grotesque",sans-serif;
+        color:#fff;
+        letter-spacing:-.02em;
+        line-height:1;
+    }
+
+    /* ---------- buttons ---------- */
+    .stackly-admin-btn{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        padding:12px 26px;
+        border-radius:999px;
+        background:var(--grad);
+        color:#fff;
+        font:600 1rem "Figtree",sans-serif;
+        border:1px solid transparent;
+        cursor:pointer;
+        box-shadow:none;
+        transition:transform .2s,box-shadow .2s;
+    }
+
+    .stackly-admin-btn:hover{box-shadow:0 12px 36px #0a6cff55;transform:translateY(-2px)}
+
+    .stackly-admin-btn.stackly-admin-ghost{
+        background:transparent;
+        color:var(--tx);
+        border-color:var(--bd);
+        box-shadow:none;
+    }
+
+    .stackly-admin-btn.stackly-admin-ghost:hover{border-color:var(--ac);color:var(--tx);box-shadow:none;transform:none}
+    .stackly-admin-btn.stackly-admin-sm{padding:6px 16px;font-size:.85rem}
+
+    @media(prefers-reduced-motion:reduce){
+        *{animation:none!important;transition:none!important}
+    }
+
+    /* ---------- toast ---------- */
+    .stackly-admin-toast{
+        position:fixed;
+        left:50%;bottom:28px;
+        transform:translate(-50%,20px);
+        background:var(--modal);
+        border:1px solid var(--bd);
+        color:var(--tx);
+        padding:12px 22px;
+        border-radius:999px;
+        font-weight:700;
+        font-size:14px;
+        box-shadow:0 30px 70px rgba(0,0,0,.5);
+        opacity:0;
+        transition:.3s;
+        z-index:9000;
+        max-width:92vw;
+        text-align:center;
+    }
+
+    .stackly-admin-toast.stackly-admin-show{opacity:1;transform:translate(-50%,0)}
+
+    /* ---------- layout ---------- */
+    .stackly-admin-dash{
+        display:grid;
+        grid-template-columns:260px minmax(0,1fr);
+        min-height:100vh;
+        min-height:100dvh;
+    }
+
+    .stackly-admin-sidebar{
+        position:sticky;
+        top:0;
+        height:100vh;
+        height:100dvh;
+        display:flex;
+        flex-direction:column;
+        padding:22px 16px;
+        background:var(--bg);
+        border-right:1px solid var(--bd);
+        z-index:50;
+        overflow-y:auto;
+    }
+
+    .stackly-admin-slogo{display:inline-flex}
+    .stackly-admin-slogo img{height:70px;width:auto;margin:0 8px 14px}
+    .stackly-admin-slogo .stackly-admin-wm{margin:0 8px 14px}
+
+    .stackly-admin-suser{
+        padding:12px;
+        border-radius:14px;
+        background:var(--card);
+        border:1px solid var(--bd);
+        margin-bottom:18px;
+    }
+
+    .stackly-admin-sname{font-weight:700;line-height:1.2}
+    .stackly-admin-semail{font-size:.8rem;color:var(--mut);word-break:break-all}
+
+    .stackly-admin-srole{
+        display:inline-block;
+        margin-top:3px;
+        font-size:.68rem;
+        font-weight:700;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+        color:var(--ac);
+    }
+
+    .stackly-admin-nav a{
+        display:flex;
+        gap:12px;
+        align-items:center;
+        padding:11px 14px;
+        border-radius:12px;
+        color:var(--mut);
+        font-weight:500;
+        margin-bottom:4px;
+        transition:background .25s,color .25s;
+    }
+
+    .stackly-admin-nav a:hover,
+    .stackly-admin-nav a.stackly-admin-active{background:var(--s2);color:#fff}
+
+    .stackly-admin-ic{width:20px;text-align:center}
+
+    .stackly-admin-nlabel{
+        padding:14px 14px 6px;
+        font-size:.7rem;
+        font-weight:700;
+        letter-spacing:.14em;
+        text-transform:uppercase;
+        color:var(--mut);
+        opacity:.75;
+    }
+
+    .stackly-admin-nlabel:first-child{padding-top:2px}
+    .stackly-admin-sfoot{margin-top:auto;padding-top:16px}
+
+    .stackly-admin-logout{
+        width:100%;
+        padding:11px;
+        border-radius:999px;
+        border:1px solid var(--bd);
+        background:transparent;
+        color:var(--tx);
+        font:600 1rem "Figtree",sans-serif;
+        cursor:pointer;
+        transition:.25s;
+    }
+
+    .stackly-admin-logout:hover{border-color:var(--ac)}
+
+    .stackly-admin-sclose,
+    .stackly-admin-mbtn,
+    .stackly-admin-backdrop{display:none}
+
+    .stackly-admin-main{padding:22px 32px 48px;min-width:0}
+
+    /* ---------- topbar ---------- */
+    .stackly-admin-topbar{display:flex;align-items:center;gap:16px;margin-bottom:26px}
+    .stackly-admin-search{flex:1;max-width:460px}
+
+    .stackly-admin-search input{
+        width:100%;
+        padding:12px 18px;
+        border-radius:14px;
+        border:1px solid var(--bd);
+        background:var(--s);
+        color:var(--tx);
+        font:inherit;
+        font-size:15px;
+    }
+
+    .stackly-admin-search input::placeholder{color:#8f84bd}
+    .stackly-admin-search input:focus{outline:0;border-color:var(--ac)}
+
+    .stackly-admin-tr{margin-left:auto;display:flex;align-items:center;gap:14px}
+
+    .stackly-admin-bell{
+        position:relative;
+        width:40px;height:40px;
+        border-radius:50%;
+        border:1px solid var(--bd);
+        background:var(--card);
+        display:grid;
+        place-items:center;
+        cursor:pointer;
+        color:inherit;
+    }
+
+    .stackly-admin-dot{
+        position:absolute;
+        top:9px;right:10px;
+        width:8px;height:8px;
+        border-radius:50%;
+        background:var(--pk);
+    }
+
+    .stackly-admin-chipp{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        padding:5px 14px 5px 5px;
+        border-radius:999px;
+        border:1px solid var(--bd);
+        background:var(--card);
+    }
+
+    .stackly-admin-av{
+        width:34px;height:34px;
+        border-radius:50%;
+        background:var(--grad);
+        color:#fff;
+        display:grid;
+        place-items:center;
+        font:800 .9rem "Bricolage Grotesque",sans-serif;
+        flex-shrink:0;
+    }
+
+    .stackly-admin-pname{font-weight:700;font-size:.9rem;line-height:1.2}
+    .stackly-admin-prole{font-size:.75rem;color:var(--mut)}
+
+    .stackly-admin-pagehead{margin-bottom:22px}
+    .stackly-admin-pagehead p{margin-top:6px}
+
+    .stackly-admin-tab{display:none}
+    .stackly-admin-tab.stackly-admin-on{display:block}
+
+    /* ---------- stats and panels ---------- */
+    .stackly-admin-stats{
+        display:grid;
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:16px;
+        margin-bottom:20px;
+    }
+
+    .stackly-admin-stats.stackly-admin-three{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+    .stackly-admin-stat,
+    .stackly-admin-panel{
+        background:var(--card);
+        border:1px solid var(--bd);
+        border-radius:22px;
+        padding:20px;
+        transition:border-color .3s;
+    }
+
+    .stackly-admin-stat:hover,
+    .stackly-admin-panel:hover{border-color:var(--ac)}
+
+    .stackly-admin-ic2{
+        width:40px;height:40px;
+        border-radius:12px;
+        display:grid;
+        place-items:center;
+        color:#0f2a43;
+        font-weight:700;
+        margin-bottom:12px;
+    }
+
+    .stackly-admin-num{font:800 clamp(1.5rem,2.6vw,2.1rem)/1.2 "Bricolage Grotesque",sans-serif}
+    .stackly-admin-lbl{color:var(--mut);font-size:.92rem}
+    .stackly-admin-up{color:var(--ac);font-size:.82rem;font-weight:700}
+
+    .stackly-admin-dgrid{
+        display:grid;
+        grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);
+        gap:18px;
+        margin-bottom:20px;
+    }
+
+    .stackly-admin-panel{margin-bottom:20px}
+    .stackly-admin-dgrid .stackly-admin-panel{margin-bottom:0}
+
+    /* ---------- tables ---------- */
+    .stackly-admin-tw{overflow-x:auto}
+    .stackly-admin-tw table{width:100%;min-width:480px;border-collapse:collapse}
+
+    .stackly-admin-tw th,
+    .stackly-admin-tw td{
+        text-align:left;
+        padding:11px 8px;
+        border-bottom:1px solid var(--bd);
+        font-size:.94rem;
+        vertical-align:middle;
+    }
+
+    .stackly-admin-tw th{color:var(--mut);font-weight:500}
+
+    .stackly-admin-status{
+        display:inline-block;
+        padding:3px 12px;
+        border-radius:999px;
+        font-size:.82rem;
+        font-weight:700;
+        background:var(--s2);
+        color:var(--hi);
+        white-space:nowrap;
+    }
+
+    .stackly-admin-status.stackly-admin-ok{background:#ff7a4526;color:var(--ac)}
+    .stackly-admin-status.stackly-admin-warn{background:#ffb83d26;color:var(--warn)}
+    .stackly-admin-status.stackly-admin-off{background:#ffffff1a;color:var(--mut)}
+
+    .stackly-admin-kv{
+        display:flex;
+        justify-content:space-between;
+        gap:12px;
+        padding:9px 0;
+        border-bottom:1px solid var(--bd);
+        font-size:.94rem;
+    }
+
+    .stackly-admin-kv span:first-child{color:var(--mut)}
+    .stackly-admin-kv b,
+    .stackly-admin-kv span:last-child{text-align:right}
+
+    /* ---------- bars and chart ---------- */
+    .stackly-admin-bar{
+        height:9px;
+        background:#ffffff1f;
+        border-radius:9px;
+        overflow:hidden;
+        margin:8px 0 12px;
+    }
+
+    .stackly-admin-bar i{display:block;height:100%;background:var(--grad);border-radius:9px}
+
+    .stackly-admin-chart{display:flex;align-items:stretch;gap:8px;height:190px}
+
+    .stackly-admin-chart div{
+        flex:1;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:4px;
+        min-width:0;
+    }
+
+    .stackly-admin-chart em{
+        flex:1;
+        width:100%;
+        display:flex;
+        flex-direction:column;
+        justify-content:flex-end;
+        align-items:center;
+        gap:6px;
+    }
+
+    .stackly-admin-chart i{display:block;width:100%;border-radius:8px 8px 4px 4px;background:var(--grad)}
+    .stackly-admin-chart small{font-size:.76rem}
+    .stackly-admin-chart b{font-size:.78rem;line-height:1}
+    .stackly-admin-chartnote{margin:12px 0 0;font-size:.85rem;opacity:.75}
+
+    /* ---------- forms ---------- */
+    .stackly-admin-form{display:grid;gap:14px}
+    .stackly-admin-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .stackly-admin-row>*{min-width:0}
+
+    .stackly-admin-form input,
+    .stackly-admin-form select{
+        width:100%;
+        padding:14px 18px;
+        border-radius:14px;
+        border:1px solid var(--bd);
+        background:var(--s);
+        color:#fff;
+        font:inherit;
+        font-size:15px;
+        transition:.25s;
+    }
+
+    .stackly-admin-form input::placeholder{color:#8f84bd}
+
+    .stackly-admin-form input:focus,
+    .stackly-admin-form select:focus,
+    .stackly-admin-ts:focus{outline:0;border-color:var(--ac)}
+
+    select option{background:var(--modal);color:#fff}
+
+    .stackly-admin-ts{
+        padding:6px 10px;
+        border-radius:10px;
+        border:1px solid var(--bd);
+        background:var(--s);
+        color:var(--tx);
+        font:inherit;
+        font-size:.88rem;
+    }
+
+    .stackly-admin-form .stackly-admin-btn{justify-self:start}
+
+    .stackly-admin-head{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-bottom:12px;
+    }
+
+    .stackly-admin-head h3{margin:0}
+    .stackly-admin-empty{padding:22px 8px;color:var(--mut)}
+
+    /* ---------- modal ---------- */
+    .stackly-admin-modal-overlay{
+        position:fixed;
+        inset:0;
+        background:rgba(15,42,67,.72);
+        backdrop-filter:blur(3px);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:999;
+        opacity:0;
+        pointer-events:none;
+        transition:opacity .25s;
+        padding:20px;
+    }
+
+    .stackly-admin-modal-overlay.stackly-admin-show{opacity:1;pointer-events:auto}
+
+    .stackly-admin-modal-box{
+        background:var(--modal);
+        border:1px solid var(--bd);
+        border-radius:22px;
+        padding:40px 36px 32px;
+        max-width:400px;
+        width:100%;
+        text-align:center;
+        transform:translateY(14px) scale(.97);
+        transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+        box-shadow:0 30px 70px rgba(0,0,0,.5);
+    }
+
+    .stackly-admin-modal-overlay.stackly-admin-show .stackly-admin-modal-box{transform:none}
+
+    .stackly-admin-modal-icon{
+        width:64px;height:64px;
+        border-radius:50%;
+        background:rgba(255,138,155,.14);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        margin:0 auto 20px;
+    }
+
+    .stackly-admin-modal-icon svg{
+        width:30px;height:30px;
+        stroke:var(--bad);
+        fill:none;
+        stroke-width:2;
+        stroke-linecap:round;
+        stroke-linejoin:round;
+    }
+
+    .stackly-admin-modal-box h2{font-size:24px;margin-bottom:10px}
+    .stackly-admin-modal-box p{font-size:14.5px;line-height:1.55;margin-bottom:24px}
+    .stackly-admin-modal-actions{display:flex;gap:10px}
+    .stackly-admin-modal-actions .stackly-admin-btn{flex:1}
+
+    /* ---------- responsive ---------- */
+    /* children of grids/flex must be allowed to shrink so tables scroll inside their wrapper instead of widening the page */
+    .stackly-admin-dash>*,
+    .stackly-admin-dgrid>*,
+    .stackly-admin-stats>*,
+    .stackly-admin-panel{min-width:0;max-width:100%}
+    .stackly-admin-main{width:100%;max-width:100vw}
+    .stackly-admin-tw{max-width:100%;-webkit-overflow-scrolling:touch}
+
+    @media(max-width:1100px){
+        .stackly-admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .stackly-admin-dgrid{grid-template-columns:minmax(0,1fr)}
+        .stackly-admin-main{padding:22px 24px 44px}
+    }
+
+    @media(max-width:900px){
+        .stackly-admin-dash{grid-template-columns:minmax(0,1fr)}
+
+        .stackly-admin-sidebar{
+            position:fixed;
+            left:0;top:0;bottom:0;
+            width:270px;
+            max-width:86vw;
+            transform:translateX(-102%);
+            transition:transform .3s;
+        }
+
+        .stackly-admin-sidebar.stackly-admin-open{transform:none}
+
+        .stackly-admin-mbtn{
+            display:grid;
+            place-items:center;
+            width:40px;height:40px;
+            border-radius:12px;
+            border:1px solid var(--bd);
+            background:var(--card);
+            color:var(--tx);
+            font-size:1.2rem;
+            cursor:pointer;
+            flex-shrink:0;
+        }
+
+        .stackly-admin-sclose{
+            display:block;
+            align-self:flex-end;
+            background:none;
+            border:0;
+            color:var(--tx);
+            font-size:1.3rem;
+            cursor:pointer;
+            padding:4px 8px;
+        }
+
+        .stackly-admin-backdrop.stackly-admin-show{
+            display:block;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.55);
+            z-index:40;
+        }
+
+        .stackly-admin-main{padding:18px 18px 40px}
+        .stackly-admin-topbar{gap:12px;margin-bottom:20px}
+        .stackly-admin-pname,
+        .stackly-admin-prole{display:none}
+        .stackly-admin-chipp{padding:5px}
+    }
+
+    @media(max-width:600px){
+        .stackly-admin-stats,
+        .stackly-admin-stats.stackly-admin-three{gap:12px}
+        .stackly-admin-row{grid-template-columns:minmax(0,1fr)}
+        .stackly-admin-topbar{flex-wrap:wrap}
+        .stackly-admin-search{order:3;flex-basis:100%;max-width:none}
+        .stackly-admin-bell{display:none}
+        .stackly-admin-stat,
+        .stackly-admin-panel{padding:16px}
+        h3{font-size:1.1rem}
+        .stackly-admin-tw table{min-width:420px}
+        .stackly-admin-tw th,
+        .stackly-admin-tw td{padding:10px 6px;font-size:.88rem}
+        .stackly-admin-chart{height:160px;gap:5px}
+        .stackly-admin-chart small{font-size:.66rem}
+        .stackly-admin-form .stackly-admin-btn{justify-self:stretch}
+        .stackly-admin-modal-box{padding:32px 22px 26px}
+    }
+
+    @media(max-width:380px){
+        .stackly-admin-stats,
+        .stackly-admin-stats.stackly-admin-three{grid-template-columns:minmax(0,1fr)}
+        .stackly-admin-main{padding:14px 12px 32px}
+        .stackly-admin-kv{flex-direction:column;gap:2px;align-items:flex-start}
+        .stackly-admin-kv b,
+        .stackly-admin-kv span:last-child{text-align:left}
+    }
+
+    /* ---------- in-page select dropdown (stays inside the screen) ---------- */
+    .stackly-admin-dd{
+        position:fixed;
+        z-index:9500;
+        margin:0;
+        padding:6px;
+        list-style:none;
+        overflow-y:auto;
+        overscroll-behavior:contain;
+        box-sizing:border-box;
+        background:var(--modal,var(--s,#16385a));
+        color:var(--tx,#f5f8ff);
+        border:1px solid var(--ac,#ff7a45);
+        border-radius:14px;
+        box-shadow:0 18px 40px rgba(0,0,0,.45);
+        font:inherit;
+        font-size:15px;
+    }
+    .stackly-admin-dd li{
+        padding:10px 12px;
+        border-radius:9px;
+        cursor:pointer;
+        overflow-wrap:anywhere;
+    }
+    .stackly-admin-dd li.stackly-admin-hl{background:rgba(10,108,255,.35)}
+    .stackly-admin-dd li[aria-selected="true"]{color:var(--ac,#ff7a45);font-weight:600}
+    .stackly-admin-dd li[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+
+/* ==========================================================
+   INDEX THEME OVERRIDES (Stackly Orthopedic Hospital)
+   Light mist canvas, white cards, ink sidebar, sun-yellow
+   pill buttons, indigo accents, Bricolage + Figtree type.
+   ========================================================== */
+body{background:var(--mist);color:var(--tx);font-family:var(--body);line-height:1.65}
+h1,h2,h3{font-family:var(--head);color:var(--ink);letter-spacing:-.025em}
+h1{font-weight:800}
+p,small{color:var(--mut)}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:6px}
+.stackly-admin-bg{background:var(--mist)}
+.stackly-admin-dash{background:var(--mist)}
+
+/* buttons (index .btn / .btn.ghost.dk) */
+.stackly-admin-btn{background:var(--sun);color:var(--ink);font-weight:700;border:0}
+.stackly-admin-btn:hover{box-shadow:0 14px 34px rgba(255,122,69,.4);transform:none}
+.stackly-admin-btn.stackly-admin-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.stackly-admin-btn.stackly-admin-ghost:hover{border-color:var(--indigo);color:var(--indigo);box-shadow:none}
+
+/* sidebar: dark ink panel like index .side */
+.stackly-admin-sidebar{
+    background:var(--ink);border-right:0;color:#cfe0f5;
+    --tx:#ffffff;--mut:#9fb6d0;--card:rgba(255,255,255,.06);--bd:rgba(255,255,255,.14);--s2:rgba(255,255,255,.1);
+}
+.stackly-admin-suser{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+.stackly-admin-sname{color:#fff}
+.stackly-admin-semail{color:#9fb6d0}
+.stackly-admin-srole,.stackly-admin-tier{color:var(--sun)}
+.stackly-admin-nav a{color:#cfe0f5;font-weight:600;border-radius:14px}
+.stackly-admin-nav a:hover,.stackly-admin-nav a.stackly-admin-active{background:rgba(255,255,255,.1);color:#fff}
+.stackly-admin-nlabel{color:#9fb6d0}
+.stackly-admin-logout{color:#fff;border:1.5px solid rgba(255,255,255,.4);background:transparent}
+.stackly-admin-logout:hover{border-color:var(--sun);color:var(--sun)}
+.stackly-admin-sclose{color:#fff}
+.stackly-admin-wm{color:#fff}
+
+/* top bar */
+.stackly-admin-bell,.stackly-admin-rb,.stackly-admin-chipp,.stackly-admin-chip,.stackly-admin-mbtn{
+    background:#fff;border:1px solid var(--line);color:var(--ink);
+}
+.stackly-admin-mbtn{background:var(--ink);color:#fff;border:0}
+.stackly-admin-av{background:var(--indigo);color:#fff}
+.stackly-admin-pname,.stackly-admin-pn{color:var(--ink)}
+.stackly-admin-dot{background:var(--rose)}
+
+/* cards / stats / panels (index .card .kpi .box) */
+.stackly-admin-stat,.stackly-admin-panel,.stackly-admin-card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--r);
+}
+.stackly-admin-stat:hover,.stackly-admin-panel:hover,.stackly-admin-card:hover{
+    border-color:transparent;box-shadow:0 30px 60px rgba(15,42,67,.12);
+}
+.stackly-admin-num{font-family:var(--head);color:var(--ink)}
+.stackly-admin-lbl{color:var(--mut)}
+.stackly-admin-up{color:#178a4c}
+.stackly-admin-ic2{color:var(--ink)}
+.stackly-admin-card .stackly-admin-img{background:var(--mist)}
+.stackly-admin-tag{color:var(--indigo)}
+.stackly-admin-row b,.stackly-admin-qb b,.stackly-admin-kv b,.stackly-admin-chart b{color:var(--ink)}
+.stackly-admin-qb{background:var(--mist);border:1px solid var(--line)}
+.stackly-admin-qb:hover{border-color:var(--indigo)}
+
+/* tables (index table / .badge) */
+.stackly-admin-tw th{background:var(--mist);color:var(--ink);font-family:var(--head);font-weight:700}
+.stackly-admin-tw td{color:var(--tx)}
+.stackly-admin-status{background:rgba(10,108,255,.1);color:var(--indigo)}
+.stackly-admin-status.stackly-admin-ok{background:rgba(46,204,113,.15);color:#178a4c}
+.stackly-admin-status.stackly-admin-warn{background:rgba(255,122,69,.25);color:#9a6700}
+.stackly-admin-status.stackly-admin-off{background:rgba(15,42,67,.07);color:var(--mut)}
+
+/* meters + chart (indigo to sky, as index .meter / .bars) */
+.stackly-admin-bar{background:var(--mist)}
+.stackly-admin-bar i{background:linear-gradient(90deg,var(--indigo),var(--sky))}
+.stackly-admin-chart i{background:linear-gradient(var(--indigo),var(--sky))}
+
+/* user-dashboard extras */
+.stackly-admin-todo li.stackly-admin-done i{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.stackly-admin-tl:hover,.stackly-admin-help:hover,.stackly-admin-lnk,.stackly-admin-empty a{color:var(--indigo)}
+.stackly-admin-news li{border-left-color:var(--rose)}
+.stackly-admin-news small{color:#c0304f}
+.stackly-admin-msg{color:#178a4c}
+.stackly-admin-fc{background:#fff;border:1.5px solid var(--line);color:var(--ink)}
+.stackly-admin-fc:hover,.stackly-admin-fc.stackly-admin-on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.stackly-admin-sw span{background:rgba(15,42,67,.2)}
+.stackly-admin-sw input:checked+span{background:var(--indigo)}
+.stackly-admin-form label{color:var(--ink);font-weight:600}
+.stackly-admin-tab .stackly-admin-kv{color:var(--tx)}
+
+
+    /* inputs: white, 1.5px line border, indigo focus ring (index .field) */
+    .stackly-admin-form input,.stackly-admin-form select,.stackly-admin-search input,.stackly-admin-ts{
+        background:#fff!important;color:var(--ink)!important;
+        border:1.5px solid var(--line)!important;border-radius:14px;
+    }
+    :is(.stackly-admin-form input,.stackly-admin-form select,.stackly-admin-search input,.stackly-admin-ts):focus{outline:0;border-color:var(--indigo)!important;box-shadow:0 0 0 4px rgba(10,108,255,.15)!important}
+    input::placeholder{color:#9a9eb8!important}
+    select option{background:#fff;color:var(--ink)}
+
+/* toast, modal, dropdown */
+.stackly-admin-toast{background:var(--ink);color:#fff;border:0;box-shadow:0 20px 50px rgba(15,42,67,.35)}
+.stackly-admin-modal-overlay{background:rgba(15,42,67,.6)}
+.stackly-admin-modal-box{background:#fff;border:0;border-radius:28px;box-shadow:0 30px 70px rgba(15,42,67,.25)}
+.stackly-admin-modal-box h2{color:var(--ink)}
+.stackly-admin-modal-icon{background:rgba(255,90,95,.16)}
+.stackly-admin-dd{background:#fff;color:var(--ink);border:1.5px solid var(--indigo);box-shadow:0 18px 40px rgba(15,42,67,.18)}
+.stackly-admin-dd li.stackly-admin-hl{background:rgba(10,108,255,.12)}
+.stackly-admin-dd li[aria-selected="true"]{color:var(--indigo)}
+
+</style>
+</head>
+<body>
+
+    <div class="stackly-admin-bg"></div>
+    <div class="stackly-admin-dash">
+        <aside class="stackly-admin-sidebar" id="sb">
+            <button class="stackly-admin-sclose" id="sc" aria-label="Close menu">&#10005;</button>
+            <a href="index.html" class="stackly-admin-slogo"><img src="./stackly.png" alt="Stackly Orthopedic Hospital" /></a>
+            <div class="stackly-admin-suser"><div class="stackly-admin-sname" data-name></div><div class="stackly-admin-semail" data-email></div><span class="stackly-admin-srole" id="badge">sroleTXT</span></div>
+            <nav class="stackly-admin-nav" id="sidenav">
+                <div class="stackly-admin-nlabel">Dashboard</div>
+                <a href="#overview" data-tab="overview"><span class="stackly-admin-ic">&#9632;</span> Overview</a>
+                <div class="stackly-admin-nlabel">Hospital</div>
+                <a href="#members" data-tab="members"><span class="stackly-admin-ic">&#9786;</span> Patients</a>
+                <a href="#bookings" data-tab="bookings"><span class="stackly-admin-ic">&#128197;</span> Appointments</a>
+                <a href="#spaces" data-tab="spaces"><span class="stackly-admin-ic">&#9670;</span> Departments</a>
+                <a href="#billing" data-tab="billing"><span class="stackly-admin-ic">&#8377;</span> Billing</a>
+                <div class="stackly-admin-nlabel">Inbox</div>
+                <a href="#messages" data-tab="messages"><span class="stackly-admin-ic">&#9993;</span> Messages</a>
+                <div class="stackly-admin-nlabel">Website</div>
+                <a href="index.html"><span class="stackly-admin-ic">&larr;</span> Back to site</a>
+            </nav>
+            <div class="stackly-admin-sfoot"><button class="stackly-admin-logout" id="out">Log out</button></div>
+        </aside>
+        <div class="stackly-admin-backdrop" id="bd"></div>
+        <main class="stackly-admin-main">
+            <div class="stackly-admin-topbar">
+                <button class="stackly-admin-mbtn" id="mb" aria-label="Open menu">&#9776;</button>
+                <div class="stackly-admin-search"><input type="search" id="q" placeholder="Search patients, appointments, bills..." aria-label="Search" /></div>
+                <div class="stackly-admin-tr"><button class="stackly-admin-bell" id="bell" aria-label="Notifications">&#128276;<span class="stackly-admin-dot"></span></button><div class="stackly-admin-chipp"><div class="stackly-admin-av" data-av>A</div><div><div class="stackly-admin-pname" data-name></div><div class="stackly-admin-prole">Admin</div></div></div></div>
+            </div>
+            <div class="stackly-admin-pagehead"><h1 id="pt"></h1><p id="ps"></p></div>
+
+            <section class="stackly-admin-tab" id="tab-overview">
+                <div class="stackly-admin-stats">
+                    <div class="stackly-admin-stat"><div class="stackly-admin-ic2" style="background:var(--ac)">&#8377;</div><div class="stackly-admin-num" id="sR">0</div><div class="stackly-admin-lbl">Monthly revenue</div><div class="stackly-admin-up">+12% vs last month</div></div>
+                    <div class="stackly-admin-stat"><div class="stackly-admin-ic2" style="background:var(--hi)">&#9786;</div><div class="stackly-admin-num" id="sM">0</div><div class="stackly-admin-lbl">Active patients</div><div class="stackly-admin-up" id="sMp"></div></div>
+                    <div class="stackly-admin-stat"><div class="stackly-admin-ic2" style="background:var(--pk)">&#9670;</div><div class="stackly-admin-num" id="sO">0</div><div class="stackly-admin-lbl">Bed and theatre occupancy</div><div class="stackly-admin-up" id="sOp"></div></div>
+                    <div class="stackly-admin-stat"><div class="stackly-admin-ic2" style="background:var(--blue)">&#8377;</div><div class="stackly-admin-num" id="sI">0</div><div class="stackly-admin-lbl">Open bills</div><div class="stackly-admin-up" id="sIp"></div></div>
+                </div>
+                <div class="stackly-admin-dgrid">
+                    <div class="stackly-admin-panel"><h3>Revenue this year</h3><div class="stackly-admin-chart" id="chart"></div><p class="stackly-admin-chartnote">Monthly revenue in lakh (INR).</p></div>
+                    <div class="stackly-admin-panel"><h3>Snapshot</h3>
+                        <div class="stackly-admin-kv"><span>Collected bills</span><b id="sC">0</b></div>
+                        <div class="stackly-admin-kv"><span>Outstanding</span><b id="sA">0</b></div>
+                        <div class="stackly-admin-kv"><span>Appointments today</span><b id="sB">0</b></div>
+                        <div class="stackly-admin-kv"><span>New consultations this week</span><b>148 (7 surgeries planned)</b></div>
+                    </div>
+                </div>
+                <div class="stackly-admin-dgrid">
+                    <div class="stackly-admin-panel"><h3>Latest appointments</h3><div class="stackly-admin-tw"><table><thead><tr><th>Patient</th><th>Service</th><th>Date</th><th>Status</th></tr></thead><tbody id="ovRows"></tbody></table></div></div>
+                    <div class="stackly-admin-panel"><h3>Occupancy by department</h3><div id="mix"></div></div>
+                </div>
+            </section>
+
+            <section class="stackly-admin-tab" id="tab-members">
+                <div class="stackly-admin-panel"><h3>Patients</h3><div class="stackly-admin-tw"><table><thead><tr><th>Name</th><th>Email</th><th>Care plan</th><th>Registered</th><th></th></tr></thead><tbody id="mRows"></tbody></table></div></div>
+            </section>
+
+            <section class="stackly-admin-tab" id="tab-bookings">
+                <div class="stackly-admin-stats stackly-admin-three">
+                    <div class="stackly-admin-stat"><div class="stackly-admin-num" id="bT">0</div><div class="stackly-admin-lbl">Total appointments</div></div>
+                    <div class="stackly-admin-stat"><div class="stackly-admin-num" id="bU">0</div><div class="stackly-admin-lbl">Upcoming</div></div>
+                    <div class="stackly-admin-stat"><div class="stackly-admin-num" id="bC">0</div><div class="stackly-admin-lbl">Cancelled</div></div>
+                </div>
+                <div class="stackly-admin-panel">
+                    <div class="stackly-admin-head"><h3>All appointments</h3><button class="stackly-admin-btn stackly-admin-ghost stackly-admin-sm" id="expB">Download CSV</button></div>
+                    <div class="stackly-admin-tw"><table><thead><tr><th>Patient</th><th>Date</th><th>Service</th><th>Duration</th><th>Status</th></tr></thead><tbody id="bRows"></tbody></table></div>
+                </div>
+            </section>
+
+            <section class="stackly-admin-tab" id="tab-spaces">
+                <div class="stackly-admin-panel"><h3>Add a department or unit</h3>
+                    <form class="stackly-admin-form" id="fS">
+                        <div class="stackly-admin-row"><input name="n" placeholder="Department or unit name" required aria-label="Department or unit name" /><input name="t" type="number" min="1" placeholder="Total beds / units" required aria-label="Total beds or units" /></div>
+                        <div class="stackly-admin-row"><input name="p" type="number" min="0" placeholder="Rate (INR)" aria-label="Rate" /><select name="s" aria-label="Status"><option>Open</option><option>Maintenance</option><option>Closed</option></select></div>
+                        <button class="stackly-admin-btn">Add department</button>
+                    </form>
+                </div>
+                <div class="stackly-admin-panel"><h3>All departments</h3><div class="stackly-admin-tw"><table><thead><tr><th>Department</th><th>In use</th><th>Rate</th><th>Status</th><th></th></tr></thead><tbody id="sRows"></tbody></table></div></div>
+            </section>
+
+            <section class="stackly-admin-tab" id="tab-billing">
+                <div class="stackly-admin-stats stackly-admin-three">
+                    <div class="stackly-admin-stat"><div class="stackly-admin-num" id="gC">0</div><div class="stackly-admin-lbl">Collected</div></div>
+                    <div class="stackly-admin-stat"><div class="stackly-admin-num" id="gO">0</div><div class="stackly-admin-lbl">Outstanding</div></div>
+                    <div class="stackly-admin-stat"><div class="stackly-admin-num" id="gN">0</div><div class="stackly-admin-lbl">Invoices</div></div>
+                </div>
+                <div class="stackly-admin-panel"><h3>Create a bill</h3>
+                    <form class="stackly-admin-form" id="fI">
+                        <div class="stackly-admin-row"><input name="c" placeholder="Patient name" required aria-label="Patient name" /><input name="a" type="number" min="1" placeholder="Amount (INR)" required aria-label="Amount" /></div>
+                        <button class="stackly-admin-btn">Add bill</button>
+                    </form>
+                </div>
+                <div class="stackly-admin-panel">
+                    <div class="stackly-admin-head"><h3>Bills</h3><button class="stackly-admin-btn stackly-admin-ghost stackly-admin-sm" id="expI">Download CSV</button></div>
+                    <div class="stackly-admin-tw"><table><thead><tr><th>Bill no.</th><th>Patient</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody id="iRows"></tbody></table></div>
+                </div>
+            </section>
+
+            <section class="stackly-admin-tab" id="tab-messages">
+                <div class="stackly-admin-panel"><h3>Messages</h3><div class="stackly-admin-tw"><table><thead><tr><th>Name</th><th>Email</th><th>Topic</th><th>Message</th><th></th></tr></thead><tbody id="gRows"></tbody></table></div></div>
+            </section>
+        </main>
+    </div>
+
+    <div class="stackly-admin-modal-overlay" id="modalOverlay" aria-hidden="true">
+        <div class="stackly-admin-modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="stackly-admin-modal-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+            <h2 id="modalTitle"></h2><p id="modalMsg"></p>
+            <div class="stackly-admin-modal-actions"><button type="button" class="stackly-admin-btn stackly-admin-ghost" id="modalCancelBtn">Cancel</button><button type="button" class="stackly-admin-btn" id="modalOkBtn">Confirm</button></div>
+        </div>
+    </div>
+
+<script>
+(function(){'use strict';
+const ROLE='admin';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const norm=e=>String(e||'').trim().toLowerCase();
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+const inr=n=>'₹'+Math.round(+n||0).toLocaleString('en-IN');
+const fd=d=>d?new Date(d+'T00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}):'—';
+const set=(id,v)=>{const e=$('#'+id);if(e)e.textContent=v};
+const enc=s=>{try{return btoa(s)}catch(e){return ''}};
+const DB={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},set(k,v){localStorage.setItem(k,JSON.stringify(v))}};
+const users=()=>DB.get('stackly_users',[]);
+const bk=e=>DB.get('stackly_bookings_'+e,[]);
+const today=()=>new Date().toISOString().slice(0,10);
+/* Auth: same storage as login (stackly_users with btoa passwords, stackly_session object) */
+const S=DB.get('stackly_session',null);
+const U=S&&users().find(u=>norm(u.email)===norm(S.email));
+if(!U){location.replace('login.html');return}
+if(U.role!==ROLE){location.replace(U.role==='admin'?'admin.html':'dashboard.html');return}
+const ME=norm(U.email);
+const saveU=f=>{const l=users(),m=l.find(x=>norm(x.email)===ME);if(!m)return;f(m);DB.set('stackly_users',l);Object.assign(U,m)};
+const toast=m=>{const t=document.createElement('div');t.className='stackly-admin-toast';t.textContent=m;document.body.appendChild(t);requestAnimationFrame(()=>t.classList.add('stackly-admin-show'));setTimeout(()=>{t.classList.remove('stackly-admin-show');setTimeout(()=>t.remove(),400)},2600)};
+const ov=$('#modalOverlay');let onYes=null;
+const closeModal=()=>{ov.classList.remove('stackly-admin-show');ov.setAttribute('aria-hidden','true');onYes=null};
+const ask=(t,m,y)=>{$('#modalTitle').textContent=t;$('#modalMsg').textContent=m;onYes=y;ov.classList.add('stackly-admin-show');ov.setAttribute('aria-hidden','false');setTimeout(()=>$('#modalOkBtn').focus(),60)};
+$('#modalOkBtn').onclick=()=>{const f=onYes;closeModal();f&&f()};
+$('#modalCancelBtn').onclick=closeModal;
+ov.onclick=e=>{if(e.target===ov)closeModal()};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&onYes)closeModal()});
+const csv=(name,rows)=>{const t=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=name;a.click();URL.revokeObjectURL(a.href)};
+const none=(n,t)=>`<tr><td colspan="${n}" class="stackly-admin-empty">${t}</td></tr>`;
+const paint=()=>{$$('[data-name]').forEach(e=>e.textContent=U.name);$$('[data-email]').forEach(e=>{e.textContent=U.email;e.title=U.email});$$('[data-av]').forEach(e=>e.textContent=(U.name||'U').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase())};
+paint();
+$$('img[src*="stackly.png"]').forEach(i=>{const w=()=>{const s=document.createElement('span');s.className='stackly-admin-wm';s.textContent='Stackly Ortho';i.replaceWith(s)};i.onerror=w;if(i.complete&&!i.naturalWidth)w()});
+const closeSb=()=>{$('#sb').classList.remove('stackly-admin-open');$('#bd').classList.remove('stackly-admin-show')};
+const filter=v=>{v=norm(v);$$('.stackly-admin-tab.stackly-admin-on tbody tr,.stackly-admin-tab.stackly-admin-on .stackly-admin-card').forEach(r=>r.style.display=!v||norm(r.textContent).includes(v)?'':'none')};
+function show(n){if(!T[n])n='overview';$$('.stackly-admin-tab').forEach(p=>p.classList.toggle('stackly-admin-on',p.id==='tab-'+n));$$('#sidenav a[data-tab]').forEach(a=>a.classList.toggle('#sidenavON',a.dataset.tab===n));set('pt',T[n][0]);set('ps',T[n][1]);closeSb();$('#q').value='';filter('');if(location.hash!=='#'+n)history.replaceState(null,'','#'+n);scrollTo(0,0)}
+$$('#sidenav a[data-tab]').forEach(a=>a.onclick=e=>{e.preventDefault();show(a.dataset.tab)});
+$('#q').oninput=e=>filter(e.target.value);
+$('#mb').onclick=()=>{$('#sb').classList.add('stackly-admin-open');$('#bd').classList.add('stackly-admin-show')};
+$('#sc').onclick=$('#bd').onclick=closeSb;
+$('#out').onclick=()=>{localStorage.removeItem('stackly_session');location.href='login.html'};
+$('#bell').onclick=()=>toast('No new notifications.');
+
+const T={overview:['Hospital overview','Revenue, patients and bed usage at a glance.'],members:['Patients','Everyone with an account and their care plan.'],bookings:['Appointments','Consultations, physiotherapy and imaging booked by patients.'],spaces:['Departments','Beds, theatres, rates and availability.'],billing:['Billing','Patient bills and collections.'],messages:['Messages','Patient enquiries and callback requests from the contact form.']};
+const PLANS=['Basic OPD','Physio Care','Joint Care','Post-surgery Care'];
+const SEED={depts:[{id:'s1',name:'Orthopedic wards',total:120,used:96,price:3500,status:'Open'},{id:'s2',name:'Private rooms',total:40,used:31,price:6500,status:'Open'},{id:'s3',name:'Operation theatres',total:6,used:4,price:45000,status:'Open'},{id:'s4',name:'Physiotherapy bays',total:16,used:11,price:600,status:'Open'},{id:'s5',name:'X-ray and MRI suite',total:4,used:2,price:1200,status:'Maintenance'}],
+bills:[{id:'INV-2041',cust:'Ramesh Kumar (knee replacement)',amt:185000,status:'Paid'},{id:'INV-2042',cust:'Lakshmi Narayanan (spine surgery)',amt:262500,status:'Due'},{id:'INV-2043',cust:'Priya Raman (fracture care)',amt:38000,status:'Paid'},{id:'INV-2044',cust:'Arun Prakash (physiotherapy)',amt:22500,status:'Overdue'}]};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'],REV=[18.2,19.1,17.8,20.4,21.0,22.3,23.5,24.1,25.6,26.9,28.4];
+const get=k=>{let v=DB.get('stackly_'+k,null);if(!Array.isArray(v)){v=SEED[k];DB.set('stackly_'+k,v)}return v};
+const save=(k,v)=>DB.set('stackly_'+k,v);
+const CLS={Paid:'ok',Due:'warn',Overdue:'off',Confirmed:'ok','Checked in':'ok',Cancelled:'off',Open:'ok',Maintenance:'warn',Closed:'off'};
+const pill=s=>`<span class="stackly-admin-status${CLS[s]?' stackly-admin-'+CLS[s]:''}">${esc(s)}</span>`;
+const opts=(l,c)=>l.map(o=>'<option'+(o===c?' selected':'')+'>'+o+'</option>').join('');
+const allB=()=>{const L=[];users().filter(u=>u.role==='user').forEach(u=>bk(norm(u.email)).forEach((b,i)=>L.push({...b,email:norm(u.email),i,status:b.status||'Confirmed'})));return L.sort((a,b)=>b.date.localeCompare(a.date))};
+function render(){
+  const US=users(),M=US.filter(u=>u.role==='user'),SP=get('depts'),IN=get('bills'),B=allB(),G=DB.get('stackly_msgs',[])||[];
+  const paid=IN.filter(i=>i.status==='Paid').reduce((a,i)=>a+i.amt,0),owed=IN.filter(i=>i.status!=='Paid'),owe=owed.reduce((a,i)=>a+i.amt,0);
+  const act=SP.filter(s=>s.status!=='Closed'),tu=act.reduce((a,s)=>a+s.used,0),tt=act.reduce((a,s)=>a+s.total,0)||1;
+  set('sR',inr(2840000+paid));set('sM',1284+M.length);set('sMp','+'+M.length+' registered here');
+  set('sO',Math.round(tu/tt*100)+'%');set('sOp',tu+' of '+tt+' units');
+  set('sI',owed.length);set('sIp',IN.filter(i=>i.status==='Overdue').length+' overdue');
+  set('sC',inr(paid));set('sA',inr(owe));set('sB',B.filter(b=>b.date===today()&&b.status!=='Cancelled').length);
+  const mx=30;$('#chart').innerHTML=REV.map((v,i)=>`<div title="${MON[i]}: ₹${v} lakh"><em><b>${v}</b><i style="height:${v/mx*100}%"></i></em><small>${MON[i]}</small></div>`).join('');
+  $('#mix').innerHTML=SP.map(s=>`<b>${esc(s.name)}</b> <small>${s.used} / ${s.total}</small><div class="stackly-admin-bar"><i style="width:${Math.min(100,Math.round(s.used/(s.total||1)*100))}%"></i></div>`).join('')||'<p class="stackly-admin-empty">No departments yet.</p>';
+  const nm=e=>(US.find(u=>norm(u.email)===e)||{}).name||e;
+  $('#ovRows').innerHTML=B.slice(0,5).map(b=>`<tr><td>${esc(nm(b.email))}</td><td>${esc(b.space)}</td><td>${fd(b.date)}</td><td>${pill(b.status)}</td></tr>`).join('')||none(4,'No appointments yet.');
+  $('#mRows').innerHTML=US.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(norm(u.email))}</td><td>${u.role==='admin'?'<span class="stackly-admin-status">admin</span>':`<select class="stackly-admin-ts" data-mp="${esc(norm(u.email))}" aria-label="Plan">${opts(PLANS,u.plan||'Basic OPD')}</select>`}</td><td>${esc(u.joined||'—')}</td><td>${u.role==='admin'?'':`<button class="stackly-admin-btn stackly-admin-ghost stackly-admin-sm" data-rmu="${esc(norm(u.email))}">Remove</button>`}</td></tr>`).join('');
+  set('bT',B.length);set('bU',B.filter(b=>b.date>=today()&&b.status!=='Cancelled').length);set('bC',B.filter(b=>b.status==='Cancelled').length);
+  $('#bRows').innerHTML=B.length?B.map(b=>`<tr><td>${esc(b.email)}</td><td>${fd(b.date)}</td><td>${esc(b.space)}</td><td>${b.hours} hr</td><td><select class="stackly-admin-ts" data-bs="${esc(b.email)}|${b.i}" aria-label="Status">${opts(['Confirmed','Checked in','Cancelled'],b.status)}</select></td></tr>`).join(''):none(5,'No appointments yet. Patient appointments appear here.');
+  $('#sRows').innerHTML=SP.length?SP.map(s=>`<tr><td>${esc(s.name)}</td><td><div class="stackly-admin-acts"><button class="stackly-admin-btn stackly-admin-ghost stackly-admin-sm" data-dec="${s.id}" aria-label="Fewer in use">-</button> ${s.used} / ${s.total} <button class="stackly-admin-btn stackly-admin-ghost stackly-admin-sm" data-inc="${s.id}" aria-label="More in use">+</button></div></td><td>${inr(s.price)}</td><td><select class="stackly-admin-ts" data-ss="${s.id}" aria-label="Status">${opts(['Open','Maintenance','Closed'],s.status)}</select></td><td><button class="stackly-admin-btn stackly-admin-ghost stackly-admin-sm" data-rms="${s.id}">Remove</button></td></tr>`).join(''):none(5,'No departments yet. Add one above.');
+  set('gC',inr(paid));set('gO',inr(owe));set('gN',IN.length);
+  $('#iRows').innerHTML=IN.length?IN.slice().reverse().map(i=>`<tr><td>${esc(i.id)}</td><td>${esc(i.cust)}</td><td>${inr(i.amt)}</td><td><select class="stackly-admin-ts" data-is="${esc(i.id)}" aria-label="Status">${opts(['Paid','Due','Overdue'],i.status)}</select></td><td><button class="stackly-admin-btn stackly-admin-ghost stackly-admin-sm" data-rmi="${esc(i.id)}">Delete</button></td></tr>`).join(''):none(5,'No bills yet.');
+  $('#gRows').innerHTML=G.length?G.map((m,i)=>`<tr><td>${esc(m.n??m.name)}</td><td>${esc(m.e??m.email)}</td><td>${esc(m.t??m.topic??'-')}</td><td>${esc(m.m??m.msg)}</td><td><button class="stackly-admin-btn stackly-admin-ghost stackly-admin-sm" data-rmm="${i}">Delete</button></td></tr>`).join(''):none(5,'No messages yet. Contact-form messages appear here.');
+  filter($('#q').value);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  const bump=(id,n)=>{const L=get('depts'),s=L.find(x=>x.id===id);if(s){s.used=Math.max(0,Math.min(s.total,s.used+n));save('depts',L);render()}};
+  if(d.inc)bump(d.inc,1);if(d.dec)bump(d.dec,-1);
+  if(d.rms)ask('Remove department?','This department will be removed from the list.',()=>{save('depts',get('depts').filter(x=>x.id!==d.rms));render();toast('Department removed.')});
+  if(d.rmi)ask('Delete bill?','This bill will be deleted.',()=>{save('bills',get('bills').filter(x=>x.id!==d.rmi));render();toast('Bill deleted.')});
+  if(d.rmu)ask('Remove patient?','This account will be removed and can no longer log in.',()=>{DB.set('stackly_users',users().filter(x=>norm(x.email)!==d.rmu));render();toast('Patient removed.')});
+  if(d.rmm!==undefined){const L=DB.get('stackly_msgs',[]);L.splice(+d.rmm,1);DB.set('stackly_msgs',L);render()}
+});
+document.addEventListener('change',e=>{
+  const s=e.target,d=s.dataset;
+  const upd=(k,id,v,m)=>{const L=get(k),x=L.find(i=>i.id===id);if(x){x.status=v;save(k,L);render();toast(m)}};
+  if(d.ss)upd('depts',d.ss,s.value,'Department set to '+s.value+'.');
+  if(d.is)upd('bills',d.is,s.value,'Bill marked '+s.value+'.');
+  if(d.mp){const l=users(),m=l.find(x=>norm(x.email)===d.mp);if(m){m.plan=s.value;DB.set('stackly_users',l);toast('Plan set to '+s.value+'.')}}
+  if(d.bs){const [em,i]=d.bs.split('|'),l=bk(em);if(l[+i]){l[+i].status=s.value;DB.set('stackly_bookings_'+em,l);render();toast('Appointment set to '+s.value+'.')}}
+});
+$('#fS').onsubmit=e=>{e.preventDefault();const E=e.target.elements,L=get('depts');L.push({id:'s'+Date.now(),name:E.n.value.trim(),total:+E.t.value,used:0,price:+E.p.value||0,status:E.s.value});save('depts',L);e.target.reset();render();toast('Department added.')};
+$('#fI').onsubmit=e=>{e.preventDefault();const E=e.target.elements,L=get('bills'),n=Math.max(2040,...L.map(i=>+String(i.id).replace(/\D/g,'')||0))+1;L.push({id:'INV-'+n,cust:E.c.value.trim(),amt:+E.a.value,status:'Due'});save('bills',L);e.target.reset();render();toast('Bill added.')};
+$('#expB').onclick=()=>{const B=allB();if(!B.length)return toast('Nothing to export yet.');csv('appointments.csv',[['Patient','Date','Service','Hours','Status'],...B.map(b=>[b.email,b.date,b.space,b.hours,b.status])])};
+$('#expI').onclick=()=>{const I=get('bills');if(!I.length)return toast('Nothing to export yet.');csv('bills.csv',[['Bill no.','Patient','Amount (INR)','Status'],...I.map(i=>[i.id,i.cust,i.amt,i.status])])};
+show(location.hash.slice(1)||'overview');render();
+
+})();
+</script>
+
+
+<script>
+/* In-page replacement for the native <select> popup so the list never leaves the screen. */
+(function () {
+  var list = null, cur = null, hl = -1;
+
+  function enabled(o) { return !o.disabled && !o.hidden; }
+
+  function close() {
+    if (list) { list.remove(); list = null; }
+    if (cur) { cur.setAttribute('aria-expanded', 'false'); cur = null; }
+    hl = -1;
+  }
+
+  function place() {
+    if (!list || !cur) return;
+    var r = cur.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight, m = 8;
+    var w = Math.min(Math.max(r.width, 160), vw - m * 2);
+    var left = Math.min(Math.max(r.left, m), vw - w - m);
+    list.style.width = w + 'px';
+    list.style.left = left + 'px';
+    list.style.maxHeight = '';
+    var below = vh - r.bottom - m - 4, above = r.top - m - 4, h = list.scrollHeight + 2;
+    if (h <= below || below >= above) {
+      list.style.top = (r.bottom + 4) + 'px';
+      list.style.bottom = 'auto';
+      list.style.maxHeight = Math.max(110, below) + 'px';
+    } else {
+      list.style.top = 'auto';
+      list.style.bottom = (vh - r.top + 4) + 'px';
+      list.style.maxHeight = Math.max(110, above) + 'px';
+    }
+  }
+
+  function setHl(i, scroll) {
+    var items = list ? list.children : [];
+    if (hl > -1 && items[hl]) items[hl].classList.remove('stackly-admin-hl');
+    hl = i;
+    if (items[i]) {
+      items[i].classList.add('stackly-admin-hl');
+      if (scroll !== false) items[i].scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  function pick(i) {
+    if (!cur) return;
+    var sel = cur, o = sel.options[i];
+    if (!o || !enabled(o)) return;
+    var changed = sel.selectedIndex !== i;
+    sel.selectedIndex = i;
+    close();
+    sel.focus();
+    if (changed) {
+      sel.dispatchEvent(new Event('input', { bubbles: true }));
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  }
+
+  function open(sel) {
+    if (sel.disabled) return;
+    if (cur === sel) { close(); return; }
+    close();
+    cur = sel;
+    sel.setAttribute('aria-expanded', 'true');
+    list = document.createElement('ul');
+    list.className = 'stackly-admin-dd';
+    list.setAttribute('role', 'listbox');
+    Array.prototype.forEach.call(sel.options, function (o, i) {
+      var li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.textContent = o.textContent;
+      if (i === sel.selectedIndex) li.setAttribute('aria-selected', 'true');
+      if (!enabled(o)) li.setAttribute('aria-disabled', 'true');
+      if (o.hidden) li.style.display = 'none';
+      li.addEventListener('mouseenter', function () { if (enabled(o)) setHl(i, false); });
+      li.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      li.addEventListener('click', function () { pick(i); });
+      list.appendChild(li);
+    });
+    document.body.appendChild(list);
+    place();
+    setHl(Math.max(sel.selectedIndex, 0));
+  }
+
+  function eligible(el) {
+    return el && el.tagName === 'SELECT' && !el.multiple && !(el.size > 1);
+  }
+
+  /* block the native popup, open ours instead */
+  function block(e) {
+    var s = e.target.closest ? e.target.closest('select') : null;
+    if (!eligible(s)) return;
+    e.preventDefault();
+    if (e.type === 'mousedown' || e.type === 'pointerdown') { s.focus(); }
+    if (e.type === 'click') open(s);
+  }
+  document.addEventListener('pointerdown', block, true);
+  document.addEventListener('mousedown', block, true);
+  document.addEventListener('click', block, true);
+
+  document.addEventListener('keydown', function (e) {
+    var s = e.target;
+    if (!eligible(s)) return;
+    if (!list || cur !== s) {
+      if (e.key === 'Enter' || e.key === ' ' || (e.altKey && e.key === 'ArrowDown')) { e.preventDefault(); open(s); }
+      return;
+    }
+    var n = s.options.length, i;
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    else if (e.key === 'Tab') { close(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(hl); }
+    else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      var step = e.key === 'ArrowDown' ? 1 : -1;
+      for (i = hl + step; i >= 0 && i < n; i += step) { if (enabled(s.options[i])) { setHl(i); break; } }
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      i = e.key === 'Home' ? 0 : n - 1;
+      while (i >= 0 && i < n && !enabled(s.options[i])) i += e.key === 'Home' ? 1 : -1;
+      if (i >= 0 && i < n) setHl(i);
+    }
+  }, true);
+
+  document.addEventListener('pointerdown', function (e) {
+    if (!list) return;
+    if (list.contains(e.target) || e.target === cur) return;
+    close();
+  }, true);
+  window.addEventListener('resize', close);
+  window.addEventListener('scroll', function (e) {
+    if (list && !list.contains(e.target)) close();
+  }, true);
+  window.addEventListener('blur', close);
+})();
+</script>
+</body>
+</html>
